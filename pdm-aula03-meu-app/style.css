@@ -1,0 +1,86 @@
+/* RESET BÁSICO
+   Essas regras deixam o comportamento mais previsível entre navegadores. */
+* {
+  box-sizing: border-box;   /* Inclui borda e padding no cálculo de largura/altura. */
+  margin: 0;                /* Remove margens padrão. */
+  padding: 0;               /* Remove paddings padrão. */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont,
+               "Segoe UI", sans-serif;  /* Define uma fonte padrão moderna. */
+}
+
+/* ESTILO GERAL DO BODY (FUNDO DO APP) */
+body {
+  background: #020617;      /* Cor escura de fundo (pode ser alterada para outro tom). */
+  color: #e5e7eb;           /* Cor padrão do texto (quase branco). */
+  min-height: 100vh;        /* Garante que ocupe toda a altura da tela. */
+  display: flex;            /* Permite usar flexbox para organizar header/main/footer. */
+  flex-direction: column;   /* Empilha elementos verticalmente. */
+}
+
+/* CABEÇALHO */
+.app-header {
+  padding: 16px;   /* Espaçamento interno (aumente/diminua para ver o efeito). */
+  text-align: center;
+  background: linear-gradient(135deg, #0ea5e9, #22c55e);
+  /* Gradiente de duas cores.
+     FAÇAM EM DUPLA:
+     testem trocar as cores (#0ea5e9, #22c55e) para adaptar ao tema do app. */
+
+  color: #020617;  /* Cor do texto do header (escuro, pois o fundo é claro). */
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.7);
+  /* Sombra para dar sensação de elevação.
+     Se remover, o cabeçalho fica mais "flat". */
+}
+
+.app-header h1 {
+  font-size: 1.4rem;  /* Tamanho do título; aumente/diminua para testar. */
+  font-weight: 700;   /* Negrito forte. */
+}
+
+.app-header p {
+  font-size: 0.9rem;  /* Tamanho do subtítulo. */
+}
+
+/* ÁREA PRINCIPAL DO APP */
+.app-main {
+  flex: 1;          /* Faz o main ocupar o espaço entre header e footer. */
+  padding: 16px;    /* Espaçamento interno das laterais. */
+}
+
+/* CARD GENÉRICO (USADO EM TAREFAS, METAS, ETC.) */
+.card {
+  background: #020617;           /* Cor de fundo do card. */
+  border-radius: 16px;           /* Bordas arredondadas (visual de "cartão"). */
+  border: 1px solid #1f2937;     /* Borda discreta para separar do fundo. */
+  padding: 16px;                 /* Espaço interno do card. */
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);
+  /* Sombra forte; se a dupla achar muito pesado, pode diminuir o alpha (0.8). */
+  margin-bottom: 16px;           /* Distância entre um card e outro. */
+}
+
+.card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+/* LISTA DE TAREFAS */
+.task-list {
+  list-style: none;         /* Remove bolinhas padrão. */
+  display: flex;
+  flex-direction: column;   /* Tarefas em coluna. */
+  gap: 8px;                 /* Espaço entre itens. */
+  margin-top: 8px;
+}
+
+.task-list li {
+  font-size: 0.95rem;
+}
+
+/* RODAPÉ DO APP */
+.app-footer {
+  padding: 8px 16px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #9ca3af;           /* Cor menos chamativa. */
+  border-top: 1px solid #1f2937;  /* Linha separando do conteúdo. */
+}

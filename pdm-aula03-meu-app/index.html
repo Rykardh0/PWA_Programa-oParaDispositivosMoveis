@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<!-- Define que o documento é HTML5.
+     Se essa linha for removida, alguns navegadores podem entrar em "modo legado"
+     e interpretar o layout de forma diferente. -->
+<html lang="pt-BR">
+<!-- lang="pt-BR" indica ao navegador e leitores de tela
+     que o idioma principal da página é português do Brasil. -->
+
+<head>
+  <meta charset="UTF-8">
+  <!-- charset UTF-8 permite usar acentos e caracteres especiais normalmente.
+       Se mudar para outro charset, você pode ver "Ã§" no lugar de "ç", por exemplo. -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- A tag viewport é fundamental para celular:
+       - width=device-width : usa a largura real da tela do dispositivo;
+       - initial-scale=1.0 : define o nível inicial de zoom.
+       Se remover, o app pode ficar "miniatura" no celular. -->
+
+  <title>Melhor App de Estudos do Mundo</title>
+  <!-- Esse texto aparece na aba do navegador.
+       FAÇAM EM DUPLA: troquem para o nome do app da dupla. -->
+
+  <meta name="theme-color" content="#0ea5e9">
+  <!-- Cor que o navegador usa para a barra de endereço em alguns dispositivos (Android).
+       Se trocar o valor (ex: #22c55e), a barra muda de cor e pode combinar com o layout. -->
+
+  <link rel="stylesheet" href="style.css">
+  <!-- Conecta o HTML ao arquivo de estilos.
+       Se o nome do arquivo CSS ou o caminho estiver errado, o app aparecerá sem estilos. -->
+
+  <!-- Em aulas futuras vamos ativar a linha abaixo:
+  <link rel="manifest" href="manifest.json">
+  -->
+</head>
+
+<body>
+  <!-- Tudo o que o usuário vê na tela vai dentro do <body> -->
+
+  <header class="app-header">
+    <!-- Cabeçalho do app: título e subtítulo -->
+    <h1>Melhor App de Estudos do Mundo</h1>
+    <!-- FAÇAM EM DUPLA:
+         troquem por um nome real, por exemplo:
+         "Rotina de Estudos da Dupla", "Treino Express da Semana",
+         "Controle de Gastos Diários", "Hábitos Saudáveis da Dupla". -->
+
+    <p>Checklist rápido para o dia</p>
+    <!-- Podem trocar por uma frase que combine com o tema:
+         "Organizem seu dia", "Foquem no essencial", etc. -->
+  </header>
+
+  <main class="app-main">
+    <!-- Conteúdo principal do app -->
+
+    <section class="card">
+      <!-- Um bloco (card) com tarefas principais -->
+      <h2>Tarefas de hoje</h2>
+
+      <ul class="task-list">
+        <!-- Lista de tarefas com checkboxes.
+             Aqui usamos <label> em volta do <input> + texto
+             para melhorar a acessibilidade:
+             - o texto fica associado ao checkbox;
+             - clicar no texto também marca/desmarca a caixa. -->
+
+        <li>
+          <label>
+            <input type="checkbox">
+            Revisar conteúdo de PWA
+          </label>
+        </li>
+
+        <li>
+          <label>
+            <input type="checkbox">
+            Ler 10 páginas de um livro
+          </label>
+        </li>
+
+        <li>
+          <label>
+            <input type="checkbox">
+            Resolver 3 exercícios
+          </label>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Abaixo vocês vão criar novas seções em dupla (exemplos):
+         - Metas da semana
+         - Hábitos saudáveis
+         - Anotações rápidas
+         - Lembretes de trabalho
+         Veremos exemplos mais abaixo. -->
+
+  </main>
+
+  <footer class="app-footer">
+    <!-- Rodapé com informação da aula -->
+    <small>&copy; 2026 - Feito na Aula de PDM</small>
+    <!-- FAÇAM EM DUPLA:
+         acrescentem o nome da dupla, turma e período, ex:
+         "&copy; 2026 - Dupla Ana e João · PDM noite" -->
+  </footer>
+
+</body>
+</html>
