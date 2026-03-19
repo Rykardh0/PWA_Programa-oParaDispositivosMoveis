@@ -21,7 +21,7 @@ body {
 .app-header {
   padding: 16px;   /* Espaçamento interno (aumente/diminua para ver o efeito). */
   text-align: center;
-  background: linear-gradient(135deg, #0ea5e9, #22c55e);
+  background: linear-gradient(135deg, #57add4, #22c55e);
   /* Gradiente de duas cores.
      FAÇAM EM DUPLA:
      testem trocar as cores (#0ea5e9, #22c55e) para adaptar ao tema do app. */
