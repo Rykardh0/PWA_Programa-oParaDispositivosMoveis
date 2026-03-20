@@ -7,6 +7,8 @@
      que o idioma principal da página é português do Brasil. -->
 
 <head>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0ea5e9">
   <meta charset="UTF-8">
   <!-- charset UTF-8 permite usar acentos e caracteres especiais normalmente.
        Se mudar para outro charset, você pode ver "Ã§" no lugar de "ç", por exemplo. -->
@@ -28,12 +30,6 @@
   <link rel="stylesheet" href="style.css">
   <!-- Conecta o HTML ao arquivo de estilos.
        Se o nome do arquivo CSS ou o caminho estiver errado, o app aparecerá sem estilos. -->
-
-  <!-- Em aulas futuras vamos ativar a linha abaixo:
-  <link rel="manifest" href="manifest.json">
-  -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0ea5e9">
 </head>
 
 <body>
@@ -47,7 +43,7 @@
          "Rotina de Estudos da Dupla", "Treino Express da Semana",
          "Controle de Gastos Diários", "Hábitos Saudáveis da Dupla". -->
 
-    <p>Checklist rápido para o dia</p>
+    <p>Checklist para o dia a dia</p>
     <!-- Podem trocar por uma frase que combine com o tema:
          "Organizem seu dia", "Foquem no essencial", etc. -->
   </header>
@@ -57,7 +53,7 @@
 
     <section class="card">
       <!-- Um bloco (card) com tarefas principais -->
-      <h2>Tarefas de hoje</h2>
+      <h2>Tarefas de Hoje</h2>
 
       <ul class="task-list">
         <!-- Lista de tarefas com checkboxes.
@@ -76,17 +72,24 @@
         <li>
           <label>
             <input type="checkbox">
-            Ler 10 páginas de um livro
+            Ler todo conteúdo sugerido
           </label>
         </li>
 
         <li>
           <label>
             <input type="checkbox">
-            Resolver 3 exercícios
+            Resolver os exercícios
           </label>
         </li>
-      </ul>
+
+        <li>
+          <label>
+            <input type="checkbox">
+            Aprender mais sobre o assunto
+          </label>
+        </li>
+      </ul>        
     </section>
 
     <!-- Abaixo vocês vão criar novas seções em dupla (exemplos):
@@ -95,12 +98,41 @@
          - Anotações rápidas
          - Lembretes de trabalho
          Veremos exemplos mais abaixo. -->
+    <section class="card">
+      <!-- Um bloco (card) com tarefas principais -->
+      <h2>Tarefas Semanais</h2>
 
+      <ul class="task-list">
+        <!-- Lista de tarefas opcionais -->
+
+        <li>
+          <label>
+            <input type="checkbox">
+            Plantar uma árvore
+          </label>
+        </li>
+
+        <li>
+          <label>
+            <input type="checkbox">
+            Desejar Bom Dia a Todos 
+          </label>
+        </li>
+
+        <li>
+          <label>
+            <input type="checkbox">
+            Beber água e dormir bem
+          </label>
+        </li>
+      </ul>
+      
+    </section>
   </main>
 
   <footer class="app-footer">
     <!-- Rodapé com informação da aula -->
-    <small>&copy; 2026 - Feito na Aula de PDM</small>
+    <small>&copy; 2026 - Copyright PDM Noite</small>
     <!-- FAÇAM EM DUPLA:
          acrescentem o nome da dupla, turma e período, ex:
          "&copy; 2026 - Dupla Ana e João · PDM noite" -->

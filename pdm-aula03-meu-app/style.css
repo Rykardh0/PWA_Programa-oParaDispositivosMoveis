@@ -21,7 +21,7 @@ body {
 .app-header {
   padding: 16px;   /* Espaçamento interno (aumente/diminua para ver o efeito). */
   text-align: center;
-  background: linear-gradient(135deg, #57add4, #22c55e);
+  background: linear-gradient(135deg, #57d46c, #c5ad22);
   /* Gradiente de duas cores.
      FAÇAM EM DUPLA:
      testem trocar as cores (#0ea5e9, #22c55e) para adaptar ao tema do app. */
@@ -49,7 +49,7 @@ body {
 
 /* CARD GENÉRICO (USADO EM TAREFAS, METAS, ETC.) */
 .card {
-  background: #020617;           /* Cor de fundo do card. */
+  background: #040f31;           /* Cor de fundo do card. */
   border-radius: 16px;           /* Bordas arredondadas (visual de "cartão"). */
   border: 1px solid #1f2937;     /* Borda discreta para separar do fundo. */
   padding: 16px;                 /* Espaço interno do card. */
