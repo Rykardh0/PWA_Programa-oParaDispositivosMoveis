@@ -10,7 +10,7 @@
 
 /* ESTILO GERAL DO BODY (FUNDO DO APP) */
 body {
-  background: #020617;      /* Cor escura de fundo (pode ser alterada para outro tom). */
+  background: #ca2626;      /* Cor escura de fundo (pode ser alterada para outro tom). */
   color: #e5e7eb;           /* Cor padrão do texto (quase branco). */
   min-height: 100vh;        /* Garante que ocupe toda a altura da tela. */
   display: flex;            /* Permite usar flexbox para organizar header/main/footer. */
@@ -26,7 +26,7 @@ body {
      FAÇAM EM DUPLA:
      testem trocar as cores (#0ea5e9, #22c55e) para adaptar ao tema do app. */
 
-  color: #020617;  /* Cor do texto do header (escuro, pois o fundo é claro). */
+  color: #002fff;  /* Cor do texto do header (escuro, pois o fundo é claro). */
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.7);
   /* Sombra para dar sensação de elevação.
      Se remover, o cabeçalho fica mais "flat". */
@@ -84,3 +84,4 @@ body {
   color: #9ca3af;           /* Cor menos chamativa. */
   border-top: 1px solid #1f2937;  /* Linha separando do conteúdo. */
 }
+
