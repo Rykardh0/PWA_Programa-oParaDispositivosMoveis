@@ -6,24 +6,42 @@
     <title>Sem Conexão</title> 
     <style> 
     *{margin:0;padding:0;box-sizing:border-box} 
-    body{font-family:system-ui,sans-serif;background:#020617; 
-        color:#e5e7eb;min-height:100vh;display:flex; 
-        flex-direction:column;align-items:center; 
-        justify-content:center;text-align:center;padding:24px} 
-    .emoji{font-size:4rem;margin-bottom:16px} 
+    body{font-family:system-ui,sans-serif;
+        background:linear-gradient(135deg,#0ea5e9,#c522c5); 
+        color:#050607;
+        min-height:100vh;
+        display:flex; 
+        flex-direction:column;
+        align-items:center; 
+        justify-content:center;
+        text-align:center;
+        padding:24px}
+
+    .emoji{font-size:10rem;margin-bottom:16px} 
     h1{font-size:1.6rem;margin-bottom:12px} 
-    p{color:#9ca3af;max-width:380px;line-height:1.6} 
-    .btn{margin-top:24px;padding:12px 28px; 
-        background:linear-gradient(135deg,#0ea5e9,#22c55e);
-        color:#020617;border:none;border-radius:12px; 
-        font-size:1rem;font-weight:600;cursor:pointer} 
+
+    p{color:#272626;max-width:380px;line-height:1.6} 
+        .btn{margin-top:24px;padding:12px 28px; 
+        background:linear-gradient(135deg,#c522c5,#0ea5e9);
+        color:#020617;
+        border:none;
+        border-radius:12px; 
+        font-size:1rem;
+        font-weight:600;
+        cursor:pointer} 
     </style> 
+    
 </head> 
     <body> 
         <div class="emoji">📡</div> 
         <h1>Você está offline</h1> 
-        <p>Quando a conexão voltar, recarregue.</p> 
+        <p>Quando a conexão voltar, recarregue.</p>
+        <p>Obrigado!🙂😁</p> 
     <button class="btn" onclick="location.reload()"> 
         Tentar novamente</button> 
     </body> 
+
+    <footer class="app-footer">
+    <small>&copy; 2026 - Copyright PDM Noite</small>
+    </footer>
 </html> 

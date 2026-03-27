@@ -10,8 +10,8 @@
 
 /* ESTILO GERAL DO BODY (FUNDO DO APP) */
 body {
-  background: #ca2626;      /* Cor escura de fundo (pode ser alterada para outro tom). */
-  color: #e5e7eb;           /* Cor padrão do texto (quase branco). */
+  background: #ffffff;      /* Cor escura de fundo (pode ser alterada para outro tom). */
+  color: #000000;           /* Cor padrão do texto (quase branco). */
   min-height: 100vh;        /* Garante que ocupe toda a altura da tela. */
   display: flex;            /* Permite usar flexbox para organizar header/main/footer. */
   flex-direction: column;   /* Empilha elementos verticalmente. */
@@ -21,12 +21,12 @@ body {
 .app-header {
   padding: 16px;   /* Espaçamento interno (aumente/diminua para ver o efeito). */
   text-align: center;
-  background: linear-gradient(135deg, #57d46c, #c5ad22);
+  background: linear-gradient(135deg, #eb68d5, #f3d2ee);
   /* Gradiente de duas cores.
      FAÇAM EM DUPLA:
      testem trocar as cores (#0ea5e9, #22c55e) para adaptar ao tema do app. */
 
-  color: #002fff;  /* Cor do texto do header (escuro, pois o fundo é claro). */
+  color: #140a0a;  /* Cor do texto do header (escuro, pois o fundo é claro). */
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.7);
   /* Sombra para dar sensação de elevação.
      Se remover, o cabeçalho fica mais "flat". */
@@ -49,11 +49,21 @@ body {
 
 /* CARD GENÉRICO (USADO EM TAREFAS, METAS, ETC.) */
 .card {
-  background: #040f31;           /* Cor de fundo do card. */
+  background: #eb68d5;           /* Cor de fundo do card. */
   border-radius: 16px;           /* Bordas arredondadas (visual de "cartão"). */
   border: 1px solid #1f2937;     /* Borda discreta para separar do fundo. */
   padding: 16px;                 /* Espaço interno do card. */
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 18px 40px rgba(53, 45, 45, 0.6);
+  /* Sombra forte; se a dupla achar muito pesado, pode diminuir o alpha (0.8). */
+  margin-bottom: 16px;           /* Distância entre um card e outro. */
+}
+
+.pgsobre {
+  background: #449fdb;           /* Cor de fundo do card. */
+  border-radius: 16px;           /* Bordas arredondadas (visual de "cartão"). */
+  border: 5px solid #022657;     /* Borda discreta para separar do fundo. */
+  padding: 16px;                 /* Espaço interno do card. */
+  box-shadow: 0 18px 40px rgba(155, 63, 216, 0.6);
   /* Sombra forte; se a dupla achar muito pesado, pode diminuir o alpha (0.8). */
   margin-bottom: 16px;           /* Distância entre um card e outro. */
 }
@@ -84,4 +94,31 @@ body {
   color: #9ca3af;           /* Cor menos chamativa. */
   border-top: 1px solid #1f2937;  /* Linha separando do conteúdo. */
 }
+
+strong{
+  color: black;
+}
+
+section button#btn-atualizar{
+  background:linear-gradient(135deg, #dea2e0, #dea2e0);
+  color: rgb(0, 0, 0) !important;
+  border: 2px;
+  border-radius: 15px;
+  margin-top:12px;
+  padding:10px 20px;
+  font-size:1rem;cursor:pointer;
+}
+
+div.apidiv{
+  background:#2f89e4;
+   padding:12px;
+   margin:8px 0;
+   border-radius:8px;
+}
+
+div.apidiv p{
+ color: #000000;
+font-size:0.9rem;
+}
+
 

@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════
 // PROJETO AV1 - Programação para Dispositivos Móveis
-// Equipe: Ricardo Henrique de Souza Santana; [Nome Completo 2] e [Nome Completo 3]
-// Matrícula: 2510138; [Matrícula2] e [Matrícula3]
+// Equipe: Ricardo Henrique de Souza Santana; Marina França e José Everton Almeida Santos Junior
+// Matrícula: 2510138; 2020102 e 2310196
 // App: Melhor App de Estudos do Mundo
 // Data: 27/03/2026
 // ═══════════════════════════════════════════════
@@ -98,25 +98,24 @@ container.innerHTML =
 function mostrarDados(dados, fonte) {
 var container = document.getElementById('conteudo-api');
 // Mostra de onde vieram os dados (ONLINE ou CACHE)
-var html = '<p style="color:#64748b;font-size:0.85rem;">'
+  var html = '<p style="color:#64748b;font-size:0.85rem;">'
 + '📡 Fonte: ' + fonte.toUpperCase() + '</p>';
 // Para cada item dos dados, cria um 'card'
-dados.forEach(function (item) {
-html += '<div style="background:#f1f5f9;'
-+ 'padding:12px;margin:8px 0;border-radius:8px;">'
+  dados.forEach(function (item) {
+  html += '<div class="apidiv">'
 + '<strong>' + item.title + '</strong>'
-+ '<p style="color:#475569;font-size:0.9rem;">'
-+ item.body.substring(0, 80) + '...</p></div>';
++ '<p>'
+  + item.body.substring(0, 80) + '...</p></div>';
 });
 // Salva a data/hora da última atualização online
-if (fonte === 'online') {
-localStorage.setItem('ultimaAtualizacao',
-new Date().toLocaleString('pt-BR'));
+  if (fonte === 'online') {
+    localStorage.setItem('ultimaAtualizacao',
+    new Date().toLocaleString('pt-BR'));
 }
 // Mostra a data/hora da última atualização
 var ultima = localStorage.getItem('ultimaAtualizacao');
-if (ultima) {
-html += '<p style="color:#94a3b8;font-size:0.8rem;'
+  if (ultima) {
+  html += '<p style="color:#94a3b8;font-size:0.8rem;'
 + 'margin-top:8px;">⏰ Última atualização: '
 + ultima + '</p>';
 }
@@ -127,6 +126,6 @@ container.innerHTML = html;
 buscarDados();
 // Busca dados ao clicar no botão 'Atualizar'
 var btnAtualizar = document.getElementById('btn-atualizar');
-if (btnAtualizar) {
-btnAtualizar.addEventListener('click', buscarDados);
+  if (btnAtualizar) {
+  btnAtualizar.addEventListener('click', buscarDados);
 }

@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════
 // PROJETO AV1 - Programação para Dispositivos Móveis
-// Equipe: Ricardo Henrique de Souza Santana; [Nome Completo 2] e [Nome Completo 3]
-// Matrícula: 2510138; [Matrícula2] e [Matrícula3]
+// Equipe: Ricardo Henrique de Souza Santana; Marina França e José Everton Almeida Santos Junior
+// Matrícula: 2510138; 2020102 e 2310196
 // App: Melhor App de Estudos do Mundo
 // Data: 27/03/2026
 // ═══════════════════════════════════════════════
@@ -59,38 +59,41 @@ self.addEventListener('fetch', function (evento) {
 var url = evento.request.url;
 // Verifica se a requisição é para a API (olha se a URL contém 'jsonplaceholder')
 if (url.indexOf('jsonplaceholder') !== -1) {
-// ── STALE WHILE REVALIDATE para APIs ──
-// 1) Serve do cache imediatamente (rápido!)
-// 2) Em paralelo, busca versão nova na rede
-// 3) Atualiza o cache com a versão nova
-evento.respondWith(
-caches.open(CACHE_NAME).then(function (cache) {
-return cache.match(evento.request)
-.then(function (respostaCache) {
-// Tenta buscar da rede (em paralelo)
-var buscaRede = fetch(evento.request)
-.then(function (respostaRede) {
-// Guarda cópia nova no cache
-// .clone() é necessário porque a resposta
-// só pode ser lida UMA vez - precisamos de
-// uma cópia para o cache e outra para o app
-cache.put(evento.request,
-respostaRede.clone());
-console.log('[SW] API atualizada no cache');
-return respostaRede;
-})
-.catch(function () {
-// Sem internet - usa o que tem no cache
-console.log(
-'[SW] API: sem rede, usando cache');
-return respostaCache;
-});
-// Se tem no cache, serve imediatamente
-// Se não tem, espera a rede responder
-return respostaCache || buscaRede;
-});
-})
-);
+  // ── STALE WHILE REVALIDATE para APIs ──
+  // 1) Serve do cache imediatamente (rápido!)
+  // 2) Em paralelo, busca versão nova na rede
+  // 3) Atualiza o cache com a versão nova
+  evento.respondWith(
+    caches.open(CACHE_NAME).then(function (cache) {
+      return cache.match(evento.request)
+        .then(function (respostaCache) {
+
+        // Tenta buscar da rede (em paralelo)
+        var buscaRede = fetch(evento.request)
+          .then(function (respostaRede) {
+          // Guarda cópia nova no cache
+          // .clone() é necessário porque a resposta
+          // só pode ser lida UMA vez - precisamos de
+          // uma cópia para o cache e outra para o app
+          cache.put(evento.request,
+            respostaRede.clone());
+          console.log(
+            '[SW] API atualizada no cache');
+          return respostaRede;
+          })
+          .catch(function () {
+           // Sem internet - usa o que tem no cache
+            console.log(
+            '[SW] API: sem rede, usando cache');
+            return respostaCache;
+          });
+
+          // Se tem no cache, serve imediatamente
+          // Se não tem, espera a rede responder
+          return respostaCache || buscaRede;
+          });
+      })
+  );
 } else {
 // ── CACHE FIRST para arquivos estáticos ──
 // (mesmo comportamento da Aula 04)
