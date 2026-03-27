@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+    <title>Status do Cache</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box }
+        body { font-family:system-ui,sans-serif;
+            background:#0f172a; color:#e2e8f0;
+            padding:24px; }
+        h1 { text-align:center; margin-bottom:24px; }
+        .cache-item { background:#1e293b;
+            padding:12px 16px; margin:8px 0;
+            border-radius:8px; border-left:4px solid #0ea5e9;
+            word-break:break-all; font-size:0.9rem; }
+        .cache-name { color:#0ea5e9; font-weight:700;
+            font-size:1.1rem; margin:16px 0 8px; }
+        .total { text-align:center; color:#94a3b8;
+            margin-top:20px; }
+        .btn { display:block; margin:20px auto;
+            padding:12px 28px; background:#ef4444;
+            color:#fff; border:none; border-radius:8px;
+            font-size:1rem; cursor:pointer; }
+        a { color:#0ea5e9; text-decoration:none;
+            display:block; text-align:center;
+            margin-top:16px; }
+    </style>
+</head>
+<body>
+    <h1>🗃️ Status do Cache</h1>
+    <div id="lista-cache">Carregando...</div>
+    <p class="total" id="total"></p>
+    <button class="btn"
+        onclick="limparCache()">🗑️ Limpar Todo Cache
+    </button>
+    <a href="./index.html">← Voltar ao App</a>
+    <script>
+        // Lista todos os caches e seus arquivos
+        async function listarCache() {
+            var lista = document.getElementById('lista-cache');
+            var nomes = await caches.keys();
+            var html = ''; var totalItens = 0;
+            for (var nome of nomes) {
+                html += '<p class="cache-name">'
+                    + nome + '</p>';
+                var cache = await caches.open(nome);
+                var chaves = await cache.keys();
+                totalItens += chaves.length;
+                chaves.forEach(function (req) {
+                    html += '<div class="cache-item">'
+                    + req.url + '</div>';
+                });
+            }
+            lista.innerHTML = html || '<p>Cache vazio</p>';
+            document.getElementById('total').textContent =
+                'Total: ' + totalItens + ' itens em '
+                + nomes.length + ' cache(s)';
+        }
+        // Apaga todos os caches
+        async function limparCache() {
+            var nomes = await caches.keys();
+            for (var nome of nomes) {
+                await caches.delete(nome);
+            }
+            alert('Cache limpo! Recarregue o app.');
+            listarCache();
+        }
+        // Executa ao abrir a página
+        listarCache();
+    </script>
+</body>
+</html>
