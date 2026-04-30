@@ -3,11 +3,11 @@
 // Equipe: Ricardo Henrique de Souza Santana; Marina França e José Everton Almeida Santos Junior
 // Matrícula: 2510138; 2020102 e 2310196
 // App: Melhor App de Estudos do Mundo
-// Data: 27/03/2026
+// Data: 30/04/2026
 // ═══════════════════════════════════════════════
 // // sw.js — O SERVICE WORKER do mini-app PWA 
   
-var CACHE_NAME = 'melhorapp-v5'; 
+var CACHE_NAME = 'melhorapp-v7'; 
   
 var ARQUIVOS_PARA_CACHEAR = [ 
   './', 
@@ -18,6 +18,7 @@ var ARQUIVOS_PARA_CACHEAR = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './offline.html',
+  './sobre.html',
   './cache-status.html'
 ]; 
   

@@ -139,6 +139,47 @@
          "&copy; 2026 - Dupla Ana e João · PDM noite" -->
   </footer>
 
+  <!-- Seção de notificações -->
+<section id="secao-notificacoes" style="padding:16px;margin:16px;
+  background:#f0f9ff;border-radius:12px;
+  border-left:4px solid #0ea5e9;">
+  <h3 style="margin-bottom:8px;">🔔 Notificações</h3>
+  <p id="status-notif" style="color:#475569;
+    font-size:0.9rem;margin-bottom:12px;">
+    Status: verificando...
+  </p>
+  <button id="btn-ativar-notif"
+    style="padding:10px 20px;
+    background:linear-gradient(135deg,#a78bfa,#38bdf8);
+    color:#fff;border:none;border-radius:8px;
+    font-size:1rem;cursor:pointer;">
+    🔔 Ativar Notificações
+  </button>
+  <button id="btn-testar-notif"
+    style="padding:10px 20px;margin-left:8px;
+    background:#1e293b;color:#fff;border:none;
+    border-radius:8px;font-size:1rem;cursor:pointer;">
+    🧪 Testar
+  </button>
+</section>
+
+  <!-- Seção de favoritos do usuário (salvos no localStorage) -->
+<section id="meus-favoritos" style="padding:16px;margin:16px;
+  border:2px dashed #a78bfa;border-radius:12px;">
+  <h2>⭐ Meus Favoritos</h2>
+  <div id="lista-favoritos">
+    <p style="color:#64748b;font-size:0.9rem;">
+      Nenhum favorito ainda. Clique na ⭐ dos posts abaixo!
+    </p>
+  </div>
+  <button id="btn-limpar-favoritos"
+    style="margin-top:12px;padding:8px 16px;
+    background:#ef4444;color:#fff;border:none;
+    border-radius:8px;cursor:pointer;font-size:0.9rem;">
+    🗑️ Limpar Favoritos
+  </button>
+</section>
+
   <!-- Seção de dados dinâmicos da API -->
   <section id="dados-api" style="padding:16px;margin:16px;">
     <h2>🌐 Dados da API (funciona offline!)</h2>
