@@ -163,6 +163,52 @@
   </button>
 </section>
 
+<!-- Seção CRUD - criar novos itens -->
+<section id="secao-crud" style="padding:16px;margin:16px;
+  background:#ecfdf5;border-radius:12px;
+  border-left:4px solid #10b981;">
+  <h2 style="margin-bottom:12px;">📝 Criar Item</h2>
+
+  <!-- Campo de título -->
+  <label style="display:block;font-size:0.9rem;
+    color:#475569;margin-bottom:4px;">Título:</label>
+  <input id="input-titulo" type="text"
+    placeholder="Ex: Comprar pão"
+    maxlength="60"
+    style="width:100%;padding:10px;border:1px solid #cbd5e1;
+    border-radius:8px;font-size:1rem;margin-bottom:12px;">
+
+  <!-- Campo de descrição -->
+  <label style="display:block;font-size:0.9rem;
+    color:#475569;margin-bottom:4px;">Descrição:</label>
+  <textarea id="input-descricao"
+    placeholder="Detalhes do item..."
+    maxlength="200" rows="3"
+    style="width:100%;padding:10px;border:1px solid #cbd5e1;
+    border-radius:8px;font-size:1rem;margin-bottom:12px;
+    font-family:inherit;resize:vertical;"></textarea>
+
+  <!-- Botão de adicionar (type=button para NÃO recarregar a página!) -->
+  <button id="btn-adicionar" type="button"
+    style="padding:10px 24px;
+    background:linear-gradient(135deg,#10b981,#34d399);
+    color:#fff;border:none;border-radius:8px;
+    font-size:1rem;font-weight:600;cursor:pointer;">
+    ✚ Adicionar
+  </button>
+  
+  <!-- Botão Cancelar (só aparece em modo edição) -->
+<button id="btn-cancelar" type="button"
+  style="padding:10px 24px;margin-left:8px;display:none;
+  background:#94a3b8;color:#fff;border:none;
+  border-radius:8px;font-size:1rem;cursor:pointer;">
+  ✖ Cancelar
+</button>
+
+  <!-- Aqui o LAB 2 vai colocar a lista de itens -->
+  <div id="lista-itens" style="margin-top:20px;"></div>
+</section>
+
   <!-- Seção de favoritos do usuário (salvos no localStorage) -->
 <section id="meus-favoritos" style="padding:16px;margin:16px;
   border:2px dashed #a78bfa;border-radius:12px;">

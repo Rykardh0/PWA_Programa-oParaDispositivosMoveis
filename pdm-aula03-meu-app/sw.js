@@ -1,13 +1,14 @@
 // ═══════════════════════════════════════════════
 // PROJETO AV1 - Programação para Dispositivos Móveis
+// AULA 07 - CRUD Completo + Web Share API
 // Equipe: Ricardo Henrique de Souza Santana; Marina França e José Everton Almeida Santos Junior
 // Matrícula: 2510138; 2020102 e 2310196
 // App: Melhor App de Estudos do Mundo
-// Data: 30/04/2026
+// Data: 21/05/2026
 // ═══════════════════════════════════════════════
 // // sw.js — O SERVICE WORKER do mini-app PWA 
   
-var CACHE_NAME = 'melhorapp-v7'; 
+var CACHE_NAME = 'melhorapp-v11.1'; 
   
 var ARQUIVOS_PARA_CACHEAR = [ 
   './', 

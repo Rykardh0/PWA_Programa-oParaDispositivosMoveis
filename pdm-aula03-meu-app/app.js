@@ -1,9 +1,10 @@
 // ═══════════════════════════════════════════════
 // PROJETO AV1 - Programação para Dispositivos Móveis
+// AULA 07 - CRUD Completo + Web Share API
 // Equipe: Ricardo Henrique de Souza Santana; Marina França e José Everton Almeida Santos Junior
 // Matrícula: 2510138; 2020102 e 2310196
 // App: Melhor App de Estudos do Mundo
-// Data: 30/04/2026
+// Data: 21/05/2026
 // ═══════════════════════════════════════════════
 // app.js — Registra o Service Worker no navegador
 
@@ -386,3 +387,317 @@ if (btnTestar) {
 
 // Atualiza o status assim que a página carrega
 atualizarStatusNotif();
+
+// ═══ CRUD - GERENCIAMENTO DE ITENS DO USUÁRIO ═══
+// Permite ao usuário criar/ler/atualizar/excluir itens próprios.
+// Tudo persiste no localStorage entre sessões.
+
+// Chave usada no localStorage. Troquem "meuapp" pelo nome do app!
+var CHAVE_ITENS = 'melhorapp.itens';
+
+// ── Gera um ID único para cada item ──
+// Date.now() = milissegundos desde 1970 (sempre crescente)
+// Math.random() = decimal entre 0 e 1
+// Combinados, evitam duplicatas mesmo em cliques muito rápidos.
+function gerarId() {
+  return Date.now() + '-' + Math.floor(Math.random() * 10000);
+}
+
+// ── Função: carregar a lista de itens do localStorage ──
+function carregarItens() {
+  var texto = localStorage.getItem(CHAVE_ITENS);
+  if (!texto) return [];
+  try {
+    return JSON.parse(texto);
+  } catch (erro) {
+    console.log('[CRUD] Dados corrompidos, resetando.');
+    return [];
+  }
+}
+
+// ── Função: salvar a lista de itens no localStorage ──
+function salvarItens(lista) {
+  localStorage.setItem(CHAVE_ITENS, JSON.stringify(lista));
+  console.log('[CRUD] Lista salva. Total:', lista.length);
+}
+
+// CREATE ou UPDATE — decide com base em idEmEdicao
+function adicionarItem() {
+  var inputTitulo = document.getElementById('input-titulo');
+  var inputDescricao = document.getElementById('input-descricao');
+
+  var titulo = inputTitulo.value.trim();
+  var descricao = inputDescricao.value.trim();
+
+  // Validação
+  if (titulo === '') {
+    alert('O título não pode ficar vazio!');
+    inputTitulo.focus();
+    return;
+  }
+
+  var itens = carregarItens();
+
+  if (idEmEdicao === null) {
+    // ─── MODO CRIAR ───
+    var novoItem = {
+      id: gerarId(),
+      titulo: titulo,
+      descricao: descricao,
+      criadoEm: new Date().toLocaleString('pt-BR')
+    };
+    itens.push(novoItem);
+    console.log('[CRUD] Criado:', novoItem);
+  } else {
+    // ─── MODO EDITAR ───
+    // .find retorna referência ao item dentro do array.
+    // Alterando suas propriedades, alteramos no array.
+    var itemExistente = itens.find(function (i) {
+      return i.id === idEmEdicao;
+    });
+    if (itemExistente) {
+      itemExistente.titulo = titulo;
+      itemExistente.descricao = descricao;
+      itemExistente.atualizadoEm =
+        new Date().toLocaleString('pt-BR');
+      console.log('[CRUD] Atualizado:', idEmEdicao);
+    }
+    // Volta para modo criar
+    cancelarEdicao();
+  }
+
+  salvarItens(itens);
+
+  // Limpa o formulário (se ainda não foi limpo pelo cancelarEdicao)
+  inputTitulo.value = '';
+  inputDescricao.value = '';
+  inputTitulo.focus();
+
+  renderizarItens();
+  notificar('✅ Item criado', titulo);
+}
+
+// ── Conecta o botão "Adicionar" ──
+var btnAdicionar = document.getElementById('btn-adicionar');
+if (btnAdicionar) {
+  btnAdicionar.addEventListener('click', adicionarItem);
+}
+
+// ── Bônus: criar ao apertar Enter no campo de título ──
+// (Usamos nome diferente "campoTitulo" para não confundir com a
+//  variável "inputTitulo" que existe DENTRO da função acima.)
+var campoTitulo = document.getElementById('input-titulo');
+if (campoTitulo) {
+  campoTitulo.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      adicionarItem();
+    }
+  });
+}
+
+// ── READ: mostra todos os itens na tela ──
+function renderizarItens() {
+  var container = document.getElementById('lista-itens');
+  if (!container) return;
+
+  var itens = carregarItens();
+
+  // Se não tem nada, mostra mensagem amigável
+  if (itens.length === 0) {
+    container.innerHTML =
+      '<p style="color:#64748b;font-size:0.9rem;'
+      + 'text-align:center;padding:20px;">'
+      + 'Nenhum item criado ainda. Use o formulário acima!</p>';
+    return;
+  }
+
+  // Mostra contador no topo
+  var html = '<p style="color:#475569;font-size:0.85rem;'
+    + 'margin-bottom:12px;">'
+    + '📊 Total: ' + itens.length + ' item(ns)'
+    + '</p>';
+
+  // Para cada item, monta um card
+  itens.forEach(function (item) {
+    // ATENÇÃO: o item.id é STRING — precisa de aspas no onclick!
+    html += '<div style="background:#fff;border:1px solid #e2e8f0;'
+      + 'border-radius:8px;padding:12px;margin-bottom:10px;'
+      + 'box-shadow:0 1px 3px rgba(0,0,0,0.05);">'
+
+      // Título do item
+      + '<h3 style="color:#0f172a;font-size:1.05rem;'
+      + 'margin-bottom:6px;">' + item.titulo + '</h3>'
+
+      // Descrição (só se tiver)
+      + (item.descricao
+        ? '<p style="color:#475569;font-size:0.9rem;'
+          + 'margin-bottom:8px;">' + item.descricao + '</p>'
+        : '')
+
+      // Data de criação
+      + '<p style="color:#94a3b8;font-size:0.75rem;'
+      + 'margin-bottom:10px;">⏰ ' + item.criadoEm + '</p>'
+
+      // Botões de ação (notem as ASPAS em volta do id!)
+      + '<div style="display:flex;gap:6px;">'
+
+      + '<button onclick="editarItem(\'' + item.id + '\')" '
+      + 'style="padding:6px 12px;background:#fbbf24;color:#000;'
+      + 'border:none;border-radius:6px;cursor:pointer;'
+      + 'font-size:0.85rem;">✏️ Editar</button>'
+
+      + '<button onclick="excluirItem(\'' + item.id + '\')" '
+      + 'style="padding:6px 12px;background:#ef4444;color:#fff;'
+      + 'border:none;border-radius:6px;cursor:pointer;'
+      + 'font-size:0.85rem;">🗑️ Excluir</button>'
+
+      + '<button onclick="compartilharItem(\'' + item.id + '\')" '
+      + 'style="padding:6px 12px;background:#3b82f6;color:#fff;'
+      + 'border:none;border-radius:6px;cursor:pointer;'
+      + 'font-size:0.85rem;">📤 Compartilhar</button>'
+
+      + '</div></div>';
+  });
+
+  container.innerHTML = html;
+}
+
+// ── DELETE: exclui um item pelo id ──
+function excluirItem(id) {
+  // Confirma antes (proteção contra clique acidental)
+  if (!confirm('Tem certeza que deseja excluir este item?')) {
+    return;
+  }
+
+  var itens = carregarItens();
+
+  // .filter() cria nova lista SEM o item com aquele id
+  // Mantém todos os itens cujo id é DIFERENTE do que queremos excluir
+  var novaLista = itens.filter(function (item) {
+    return item.id !== id;
+  });
+
+  salvarItens(novaLista);
+  console.log('[CRUD] Excluído:', id);
+
+  // Re-renderiza para atualizar a tela
+  renderizarItens();
+}
+
+// ── Funções TEMPORÁRIAS para editar e compartilhar ──
+// Serão implementadas nos LAB 3 e LAB 4
+// Variável global: guarda qual item está sendo editado
+// null = modo "criar novo"
+// string com id = modo "editar item existente"
+var idEmEdicao = null;
+
+// ── UPDATE - Parte 1: preparar o formulário para edição ──
+function editarItem(id) {
+  // Acha o item na lista pelo id
+  var itens = carregarItens();
+  var item = itens.find(function (i) {
+    return i.id === id;
+  });
+
+  if (!item) {
+    alert('Item não encontrado!');
+    return;
+  }
+
+  // Preenche o formulário com os dados do item
+  document.getElementById('input-titulo').value = item.titulo;
+  document.getElementById('input-descricao').value = item.descricao || '';
+
+  // Guarda o id em edição (variável global)
+  idEmEdicao = id;
+
+  // Muda o botão Adicionar para Salvar Edição
+  var btnAdd = document.getElementById('btn-adicionar');
+  btnAdd.textContent = '💾 Salvar Edição';
+  btnAdd.style.background =
+    'linear-gradient(135deg,#f59e0b,#fbbf24)';
+
+  // Mostra o botão Cancelar
+  document.getElementById('btn-cancelar').style.display =
+    'inline-block';
+
+  // Rola a tela para o formulário
+  document.getElementById('secao-crud')
+    .scrollIntoView({ behavior: 'smooth' });
+
+  // Coloca o cursor no campo de título
+  document.getElementById('input-titulo').focus();
+
+  console.log('[CRUD] Modo edição:', id);
+}
+
+// ── Cancela a edição, volta para "modo criar" ──
+function cancelarEdicao() {
+  idEmEdicao = null;
+  document.getElementById('input-titulo').value = '';
+  document.getElementById('input-descricao').value = '';
+
+  var btnAdd = document.getElementById('btn-adicionar');
+  btnAdd.textContent = '✚ Adicionar';
+  btnAdd.style.background =
+    'linear-gradient(135deg,#10b981,#34d399)';
+
+  document.getElementById('btn-cancelar').style.display = 'none';
+  console.log('[CRUD] Edição cancelada');
+}
+
+// ── Conecta o botão Cancelar ──
+var btnCancelar = document.getElementById('btn-cancelar');
+if (btnCancelar) {
+  btnCancelar.addEventListener('click', cancelarEdicao);
+}
+
+// ── SHARE: compartilha um item usando a Web Share API ──
+function compartilharItem(id) {
+  var itens = carregarItens();
+  var item = itens.find(function (i) {
+    return i.id === id;
+  });
+
+  if (!item) return;
+
+  // Monta o texto que será compartilhado
+  var texto = '📌 ' + item.titulo + '\n\n'
+    + (item.descricao || '')
+    + '\n\n— Criado em ' + item.criadoEm;
+
+  // Verifica se o navegador suporta Web Share
+  // 'share' in navigator = navigator tem o método share?
+  if (navigator.share) {
+    // ─── MODO 1: Web Share API (navegador moderno) ───
+    navigator.share({
+      title: item.titulo,
+      text: texto
+    })
+    .then(function () {
+      console.log('[SHARE] Compartilhado!');
+    })
+    .catch(function (erro) {
+      // O usuário pode ter cancelado — não é erro grave
+      console.log('[SHARE] Cancelado ou erro:', erro.message);
+    });
+  } else {
+    // ─── MODO 2: FALLBACK (navegador sem suporte) ───
+    // Tenta copiar para a área de transferência
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(texto).then(function () {
+        alert('Web Share não suportado neste navegador.\n\n'
+          + '✅ Texto copiado para área de transferência!\n\n'
+          + 'Cole no app que quiser (Ctrl+V).');
+      });
+    } else {
+      // Último recurso: mostra o texto num alert
+      alert('Texto para compartilhar:\n\n' + texto);
+    }
+    console.log('[SHARE] Fallback usado');
+  }
+}
+
+// ── IMPORTANTE: renderiza ao carregar a página ──
+// Sem isso, os itens só aparecem após criar/excluir um.
+renderizarItens();
