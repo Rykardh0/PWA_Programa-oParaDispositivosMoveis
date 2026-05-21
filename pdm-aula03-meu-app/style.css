@@ -121,4 +121,14 @@ div.apidiv p{
 font-size:0.9rem;
 }
 
+/* Caixa de Busca */
+.boxBusca {
+  background: #e9dee4;
+  display: flex;
+  list-style-type: none;
+  gap: 5px; /* Espaçamento entre os itens */
+  padding: 1;
+  font-size: 16px;
+  outline: none; /* Remove a borda padrão do navegador */
+}
 

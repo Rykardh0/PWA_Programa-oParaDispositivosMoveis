@@ -8,7 +8,7 @@
 // ═══════════════════════════════════════════════
 // // sw.js — O SERVICE WORKER do mini-app PWA 
   
-var CACHE_NAME = 'melhorapp-v11.1'; 
+var CACHE_NAME = 'melhorapp-v11.3'; 
   
 var ARQUIVOS_PARA_CACHEAR = [ 
   './', 

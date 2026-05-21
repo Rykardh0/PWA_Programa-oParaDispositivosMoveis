@@ -8,51 +8,51 @@
 // ═══════════════════════════════════════════════
 // app.js — Registra o Service Worker no navegador
 
-if ('serviceWorker' in navigator) { 
+if ('serviceWorker' in navigator) {
 
-window.addEventListener('load', function () { 
+  window.addEventListener('load', function () {
 
-navigator.serviceWorker.register('./sw.js') 
+    navigator.serviceWorker.register('./sw.js')
 
-.then(function (registration) { 
-console.log('✅ Service Worker registrado com sucesso!'); 
-console.log(' Escopo:', registration.scope); 
-}) 
+      .then(function (registration) {
+        console.log('✅ Service Worker registrado com sucesso!');
+        console.log(' Escopo:', registration.scope);
+      })
 
-.catch(function (erro) { 
-console.log('❌ Falha ao registrar o SW:', erro); 
-}); 
+      .catch(function (erro) {
+        console.log('❌ Falha ao registrar o SW:', erro);
+      });
 
-  }); 
+  });
 
-} else { 
-console.log('⚠️ Este navegador não suporta SW.'); 
+} else {
+  console.log('⚠️ Este navegador não suporta SW.');
 }
 
 // ═══ BANNER DE STATUS ONLINE / OFFLINE ═══ 
-function atualizarStatusConexao() { 
-  var banner = document.getElementById('status-conexao'); 
-  if (!banner) { 
-    banner = document.createElement('div'); 
-    banner.id = 'status-conexao'; 
-    banner.style.cssText = 
-      'text-align:center;padding:8px 16px;font-size:14px;' + 
-      'font-weight:600;font-family:system-ui,sans-serif;' + 
-      'transition:all 0.3s;position:sticky;top:0;z-index:9999;'; 
-    document.body.insertBefore(banner, document.body.firstChild); 
-  } 
-  if (navigator.onLine) { 
-    banner.textContent = '🟢 Você está online'; 
-    banner.style.background = '#065f46'; 
-    banner.style.color = '#bbf7d0'; 
-  } else { 
-    banner.textContent = '🔴 Você está offline — usando cache'; 
-    banner.style.background = '#7c2d12'; 
-    banner.style.color = '#fed7aa'; 
-  } 
-} 
-atualizarStatusConexao(); 
-window.addEventListener('online', atualizarStatusConexao); 
+function atualizarStatusConexao() {
+  var banner = document.getElementById('status-conexao');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'status-conexao';
+    banner.style.cssText =
+      'text-align:center;padding:8px 16px;font-size:14px;' +
+      'font-weight:600;font-family:system-ui,sans-serif;' +
+      'transition:all 0.3s;position:sticky;top:0;z-index:9999;';
+    document.body.insertBefore(banner, document.body.firstChild);
+  }
+  if (navigator.onLine) {
+    banner.textContent = '🟢 Você está online';
+    banner.style.background = '#065f46';
+    banner.style.color = '#bbf7d0';
+  } else {
+    banner.textContent = '🔴 Você está offline — usando cache';
+    banner.style.background = '#7c2d12';
+    banner.style.color = '#fed7aa';
+  }
+}
+atualizarStatusConexao();
+window.addEventListener('online', atualizarStatusConexao);
 window.addEventListener('offline', atualizarStatusConexao);
 
 // ═══ BUSCA DE DADOS DA API COM CACHE ═══
@@ -62,38 +62,38 @@ window.addEventListener('offline', atualizarStatusConexao);
 var API_URL = 'https://jsonplaceholder.typicode.com/posts?_limit=5';
 // Função principal: busca os dados da API
 function buscarDados() {
-// Pega o elemento da página onde vamos mostrar os dados
-var container = document.getElementById('conteudo-api');
-if (!container) return; // Se não encontrou, para aqui
-// Mostra mensagem de 'carregando' enquanto busca
-container.innerHTML = '<p>⏳ Buscando dados...</p>';
-// fetch() = função que busca dados na internet
-// É como digitar a URL no navegador, mas via código
-fetch(API_URL)
-.then(function (resposta) {
-// Converte a resposta para formato JSON (objeto JS)
-return resposta.json();
-})
-.then(function (dados) {
-// Deu certo! Mostra os dados com fonte 'online'
-mostrarDados(dados, 'online');
-})
-.catch(function () {
-// Deu erro (provavelmente offline)
-// Tenta buscar do cache do Service Worker
-caches.match(API_URL).then(function (respCache) {
-if (respCache) {
-// Tem dados no cache! Mostra com fonte 'cache'
-respCache.json().then(function (dados) {
-mostrarDados(dados, 'cache');
-});
-} else {
-// Não tem nada no cache
-container.innerHTML =
-'<p>❌ Sem dados disponíveis offline.</p>';
-}
-});
-});
+  // Pega o elemento da página onde vamos mostrar os dados
+  var container = document.getElementById('conteudo-api');
+  if (!container) return; // Se não encontrou, para aqui
+  // Mostra mensagem de 'carregando' enquanto busca
+  container.innerHTML = '<p>⏳ Buscando dados...</p>';
+  // fetch() = função que busca dados na internet
+  // É como digitar a URL no navegador, mas via código
+  fetch(API_URL)
+    .then(function (resposta) {
+      // Converte a resposta para formato JSON (objeto JS)
+      return resposta.json();
+    })
+    .then(function (dados) {
+      // Deu certo! Mostra os dados com fonte 'online'
+      mostrarDados(dados, 'online');
+    })
+    .catch(function () {
+      // Deu erro (provavelmente offline)
+      // Tenta buscar do cache do Service Worker
+      caches.match(API_URL).then(function (respCache) {
+        if (respCache) {
+          // Tem dados no cache! Mostra com fonte 'cache'
+          respCache.json().then(function (dados) {
+            mostrarDados(dados, 'cache');
+          });
+        } else {
+          // Não tem nada no cache
+          container.innerHTML =
+            '<p>❌ Sem dados disponíveis offline.</p>';
+        }
+      });
+    });
 }
 
 // Função que monta o HTML dos dados na tela (AGORA COM FAVORITOS)
@@ -155,7 +155,7 @@ function mostrarDados(dados, fonte) {
 buscarDados();
 // Busca dados ao clicar no botão 'Atualizar'
 var btnAtualizar = document.getElementById('btn-atualizar');
-  if (btnAtualizar) {
+if (btnAtualizar) {
   btnAtualizar.addEventListener('click', buscarDados);
 }
 
@@ -531,7 +531,7 @@ function renderizarItens() {
       // Descrição (só se tiver)
       + (item.descricao
         ? '<p style="color:#475569;font-size:0.9rem;'
-          + 'margin-bottom:8px;">' + item.descricao + '</p>'
+        + 'margin-bottom:8px;">' + item.descricao + '</p>'
         : '')
 
       // Data de criação
@@ -674,13 +674,13 @@ function compartilharItem(id) {
       title: item.titulo,
       text: texto
     })
-    .then(function () {
-      console.log('[SHARE] Compartilhado!');
-    })
-    .catch(function (erro) {
-      // O usuário pode ter cancelado — não é erro grave
-      console.log('[SHARE] Cancelado ou erro:', erro.message);
-    });
+      .then(function () {
+        console.log('[SHARE] Compartilhado!');
+      })
+      .catch(function (erro) {
+        // O usuário pode ter cancelado — não é erro grave
+        console.log('[SHARE] Cancelado ou erro:', erro.message);
+      });
   } else {
     // ─── MODO 2: FALLBACK (navegador sem suporte) ───
     // Tenta copiar para a área de transferência
@@ -701,3 +701,39 @@ function compartilharItem(id) {
 // ── IMPORTANTE: renderiza ao carregar a página ──
 // Sem isso, os itens só aparecem após criar/excluir um.
 renderizarItens();
+
+// Elementos da Busca
+const campoBusca = document.getElementById("campoBusca");
+const listaItens = document.getElementById("listaItens");
+var itens = carregarItens();
+
+
+// Função para renderizar os itens na tela
+function renderizarLista(itens) {
+  // Limpa a lista atual antes de desenhar os novos itens
+  listaItens.innerHTML = itens.map(item => `<li>${item.titulo}</li>`).join("");
+  listaItens.style.display = "none";
+}
+
+// Função que escuta a digitação e filtra os dados
+campoBusca.addEventListener("input", (evento) => {
+  listaItens.style.display = "block";
+  const termoBusca = evento.target.value.toLowerCase();
+
+  // Filtra o array original com base no termo digitado
+  const itensFiltrados = itens.filter(itens =>
+    itens.titulo.toLowerCase().includes(termoBusca)
+  );
+
+  if (termoBusca == "") {
+    listaItens.style.display = "none";
+    exit(0);
+  }
+  // Atualiza a tela com o resultado do filtro
+  renderizarLista(itensFiltrados);
+  listaItens.style.display = "block";
+
+});
+
+// Inicializa a tela mostrando todos os Itens
+renderizarLista(itens);
