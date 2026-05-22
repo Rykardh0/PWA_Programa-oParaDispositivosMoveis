@@ -495,14 +495,13 @@ if (campoTitulo) {
   });
 }
 
-// ── READ: mostra todos os itens na tela ──
+// READ: mostra todos os itens na tela (AGORA com título clicável)
 function renderizarItens() {
   var container = document.getElementById('lista-itens');
   if (!container) return;
 
   var itens = carregarItens();
 
-  // Se não tem nada, mostra mensagem amigável
   if (itens.length === 0) {
     container.innerHTML =
       '<p style="color:#64748b;font-size:0.9rem;'
@@ -511,36 +510,38 @@ function renderizarItens() {
     return;
   }
 
-  // Mostra contador no topo
   var html = '<p style="color:#475569;font-size:0.85rem;'
     + 'margin-bottom:12px;">'
     + '📊 Total: ' + itens.length + ' item(ns)'
     + '</p>';
 
-  // Para cada item, monta um card
   itens.forEach(function (item) {
-    // ATENÇÃO: o item.id é STRING — precisa de aspas no onclick!
     html += '<div style="background:#fff;border:1px solid #e2e8f0;'
       + 'border-radius:8px;padding:12px;margin-bottom:10px;'
       + 'box-shadow:0 1px 3px rgba(0,0,0,0.05);">'
 
-      // Título do item
+      // ★ MUDANÇA: o título agora é CLICÁVEL (chama abrirDetalhes)
       + '<h3 style="color:#0f172a;font-size:1.05rem;'
-      + 'margin-bottom:6px;">' + item.titulo + '</h3>'
+      + 'margin-bottom:6px;cursor:pointer;'
+      + 'text-decoration:underline;text-decoration-color:#94a3b8;" '
+      + 'onclick="abrirDetalhes(\'' + item.id + '\')">'
+      + item.titulo + ' 🔍</h3>'
 
-      // Descrição (só se tiver)
+      // Descrição (corta em 80 chars para não poluir a lista)
       + (item.descricao
         ? '<p style="color:#475569;font-size:0.9rem;'
-        + 'margin-bottom:8px;">' + item.descricao + '</p>'
+          + 'margin-bottom:8px;">'
+          + (item.descricao.length > 80
+              ? item.descricao.substring(0, 80) + '...'
+              : item.descricao)
+          + '</p>'
         : '')
 
-      // Data de criação
       + '<p style="color:#94a3b8;font-size:0.75rem;'
       + 'margin-bottom:10px;">⏰ ' + item.criadoEm + '</p>'
 
-      // Botões de ação (notem as ASPAS em volta do id!)
-      + '<div style="display:flex;gap:6px;">'
-
+      // Botões de ação (continuam iguais)
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;">'
       + '<button onclick="editarItem(\'' + item.id + '\')" '
       + 'style="padding:6px 12px;background:#fbbf24;color:#000;'
       + 'border:none;border-radius:6px;cursor:pointer;'
@@ -737,3 +738,133 @@ campoBusca.addEventListener("input", (evento) => {
 
 // Inicializa a tela mostrando todos os Itens
 renderizarLista(itens);
+
+// ═══ AV2 - SISTEMA DE ROTAS (tela de lista vs tela de detalhes) ═══
+// Usa window.location.hash para saber qual tela mostrar.
+// Exemplos de hash:
+//   ""          → tela de lista (padrão)
+//   "#item/123" → tela de detalhes do item com id 123
+
+// ── Função central: decide qual tela mostrar baseado no hash ──
+function processarRota() {
+  var hash = window.location.hash; // Ex: "#item/abc123"
+  console.log('[ROUTE] Hash atual:', hash);
+
+  // Pega as duas seções
+  var telaLista = document.getElementById('secao-crud');
+  var telaDetalhes = document.getElementById('tela-detalhes');
+
+  // Verifica se o hash começa com "#item/"
+  if (hash.indexOf('#item/') === 0) {
+    // ─── MOSTRAR TELA DE DETALHES ───
+    // Extrai o id depois do "#item/"
+    var id = hash.substring('#item/'.length);
+    console.log('[ROUTE] Mostrando detalhes do item:', id);
+
+    // Esconde a lista, mostra os detalhes
+    telaLista.style.display = 'none';
+    telaDetalhes.style.display = 'block';
+
+    // Preenche o conteúdo
+    mostrarDetalhes(id);
+  } else {
+    // ─── MOSTRAR TELA DE LISTA ───
+    console.log('[ROUTE] Mostrando lista');
+    telaLista.style.display = 'block';
+    telaDetalhes.style.display = 'none';
+
+    // Re-renderiza a lista (caso tenha sido editada na tela de detalhes)
+    renderizarItens();
+  }
+
+  // Rola para o topo da página
+  window.scrollTo(0, 0);
+}
+
+// ── Função: monta o HTML da tela de detalhes ──
+function mostrarDetalhes(id) {
+  var itens = carregarItens();
+  var item = itens.find(function (i) {
+    return i.id === id;
+  });
+
+  var container = document.getElementById('conteudo-detalhes');
+
+  // Se o item não existe (foi excluído), mostra mensagem
+  if (!item) {
+    container.innerHTML =
+      '<p style="color:#dc2626;padding:20px;text-align:center;">'
+      + '⚠️ Item não encontrado. Pode ter sido excluído.</p>';
+    return;
+  }
+
+  // Monta HTML detalhado (título grande, descrição completa, data)
+  var html = '<h1 style="font-size:1.8rem;color:#0f172a;'
+    + 'margin-bottom:12px;">' + item.titulo + '</h1>';
+
+  // Descrição (se tiver)
+  if (item.descricao) {
+    html += '<p style="color:#334155;font-size:1.05rem;'
+      + 'line-height:1.7;margin-bottom:20px;'
+      + 'white-space:pre-wrap;">' + item.descricao + '</p>';
+  }
+
+  // Metadados
+  html += '<div style="background:#fef3c7;padding:12px;'
+    + 'border-radius:8px;font-size:0.85rem;color:#78350f;'
+    + 'margin-bottom:20px;">'
+    + '<p>⏰ Criado em: ' + item.criadoEm + '</p>';
+
+  if (item.atualizadoEm) {
+    html += '<p>✏️ Editado em: ' + item.atualizadoEm + '</p>';
+  }
+
+  html += '<p style="color:#92400e;font-family:monospace;'
+    + 'font-size:0.75rem;margin-top:6px;">'
+    + 'ID: ' + item.id + '</p>'
+    + '</div>';
+
+  // Botões de ação
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+
+    + '<button onclick="editarItem(\'' + item.id + '\');voltarParaLista();" '
+    + 'style="padding:10px 20px;background:#fbbf24;color:#000;'
+    + 'border:none;border-radius:8px;cursor:pointer;'
+    + 'font-size:0.95rem;font-weight:600;">✏️ Editar</button>'
+
+    + '<button onclick="if(confirm(\'Excluir?\')){excluirItem(\'' + item.id + '\');voltarParaLista();}" '
+    + 'style="padding:10px 20px;background:#ef4444;color:#fff;'
+    + 'border:none;border-radius:8px;cursor:pointer;'
+    + 'font-size:0.95rem;font-weight:600;">🗑️ Excluir</button>'
+
+    + '<button onclick="compartilharItem(\'' + item.id + '\')" '
+    + 'style="padding:10px 20px;background:#3b82f6;color:#fff;'
+    + 'border:none;border-radius:8px;cursor:pointer;'
+    + 'font-size:0.95rem;font-weight:600;">📤 Compartilhar</button>'
+
+    + '</div>';
+
+  container.innerHTML = html;
+}
+
+// ── Função: navega para a lista (limpa o hash) ──
+function voltarParaLista() {
+  window.location.hash = '';
+}
+
+// ── Função: abre a tela de detalhes de um item ──
+function abrirDetalhes(id) {
+  window.location.hash = '#item/' + id;
+}
+
+// ── Conecta o botão Voltar ──
+var btnVoltar = document.getElementById('btn-voltar');
+if (btnVoltar) {
+  btnVoltar.addEventListener('click', voltarParaLista);
+}
+
+// ── Escuta mudanças no hash (back/forward do navegador, edição direta da URL) ──
+window.addEventListener('hashchange', processarRota);
+
+// ── Processa a rota ao carregar a página (importante para F5 funcionar) ──
+processarRota();

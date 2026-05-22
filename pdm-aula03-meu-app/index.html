@@ -226,6 +226,23 @@
   <div id="lista-itens" style="margin-top:20px;"></div>
 </section>
 
+<!-- AV2 - TELA DE DETALHES (escondida por padrão) -->
+<section id="tela-detalhes" style="display:none;
+  padding:16px;margin:16px;
+  background:#fffbeb;border-radius:12px;
+  border-left:4px solid #f59e0b;">
+
+  <button id="btn-voltar" type="button"
+    style="padding:8px 16px;margin-bottom:16px;
+    background:#1e293b;color:#fff;border:none;
+    border-radius:8px;cursor:pointer;font-size:0.95rem;">
+    ← Voltar
+  </button>
+
+  <!-- Aqui o JS vai colocar os detalhes do item -->
+  <div id="conteudo-detalhes"></div>
+</section>
+
   <!-- Seção de favoritos do usuário (salvos no localStorage) -->
 <section id="meus-favoritos" style="padding:16px;margin:16px;
   border:2px dashed #a78bfa;border-radius:12px;">
