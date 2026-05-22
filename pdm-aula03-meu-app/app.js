@@ -703,41 +703,34 @@ function compartilharItem(id) {
 // Sem isso, os itens só aparecem após criar/excluir um.
 renderizarItens();
 
-// Elementos da Busca
-const campoBusca = document.getElementById("campoBusca");
-const listaItens = document.getElementById("listaItens");
-var itens = carregarItens();
-
-
-// Função para renderizar os itens na tela
-function renderizarLista(itens) {
-  // Limpa a lista atual antes de desenhar os novos itens
-  listaItens.innerHTML = itens.map(item => `<li>${item.titulo}</li>`).join("");
-  listaItens.style.display = "none";
-}
-
-// Função que escuta a digitação e filtra os dados
-campoBusca.addEventListener("input", (evento) => {
-  listaItens.style.display = "block";
-  const termoBusca = evento.target.value.toLowerCase();
-
-  // Filtra o array original com base no termo digitado
-  const itensFiltrados = itens.filter(itens =>
-    itens.titulo.toLowerCase().includes(termoBusca)
-  );
-
-  if (termoBusca == "") {
-    listaItens.style.display = "none";
-    exit(0);
-  }
-  // Atualiza a tela com o resultado do filtro
-  renderizarLista(itensFiltrados);
-  listaItens.style.display = "block";
-
-});
-
-// Inicializa a tela mostrando todos os Itens
-renderizarLista(itens);
+// // Elementos da Busca
+// const campoBusca = document.getElementById("campoBusca");
+// const listaItens = document.getElementById("listaItens");
+// var itens = carregarItens();
+// // Função para renderizar os itens na tela
+// function renderizarLista(itens) {
+//   // Limpa a lista atual antes de desenhar os novos itens
+//   listaItens.innerHTML = itens.map(item => `<li>${item.titulo}</li>`).join("");
+//   listaItens.style.display = "none";
+// }
+// // Função que escuta a digitação e filtra os dados
+// campoBusca.addEventListener("input", (evento) => {
+//   listaItens.style.display = "block";
+//   const termoBusca = evento.target.value.toLowerCase();
+//   // Filtra o array original com base no termo digitado
+//   const itensFiltrados = itens.filter(itens =>
+//     itens.titulo.toLowerCase().includes(termoBusca)
+//   );
+//   if (termoBusca == "") {
+//     listaItens.style.display = "none";
+//     exit(0);
+//   }
+//   // Atualiza a tela com o resultado do filtro
+//   renderizarLista(itensFiltrados);
+//   listaItens.style.display = "block";
+// });
+// // Inicializa a tela mostrando todos os Itens
+// renderizarLista(itens);
 
 // ═══ AV2 - SISTEMA DE ROTAS (tela de lista vs tela de detalhes) ═══
 // Usa window.location.hash para saber qual tela mostrar.
