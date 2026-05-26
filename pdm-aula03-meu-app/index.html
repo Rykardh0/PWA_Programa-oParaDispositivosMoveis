@@ -189,6 +189,19 @@
     border-radius:8px;font-size:1rem;margin-bottom:12px;
     font-family:inherit;resize:vertical;"></textarea>
 
+    <!-- AV2 - Campo de categoria -->
+  <label style="display:block;font-size:0.9rem;
+    color:#475569;margin-bottom:4px;">Categoria:</label>
+  <select id="input-categoria"
+    style="width:100%;padding:10px;border:1px solid #cbd5e1;
+    border-radius:8px;font-size:1rem;margin-bottom:12px;
+    background:#fff;">
+  <option value="Outro">📁 Outro</option>
+  <option value="Trabalho">💼 Trabalho</option>
+  <option value="Pessoal">❤️ Pessoal</option>
+  <option value="Estudos">📚 Estudos</option>
+  </select>
+
   <!-- Botão de adicionar (type=button para NÃO recarregar a página!) -->
   <button id="btn-adicionar" type="button"
     style="padding:10px 24px;
@@ -206,6 +219,25 @@
   ✖ Cancelar
 </button>
 
+  <!-- AV2 - Barra de busca e filtros -->
+  <div style="display:flex;gap:8px;margin-top:20px;
+    margin-bottom:8px;flex-wrap:wrap;">
+    <input id="input-busca" type="text"
+      placeholder="🔎 Buscar..."
+      style="flex:1;min-width:180px;padding:8px 12px;
+      border:1px solid #cbd5e1;border-radius:8px;font-size:0.9rem;">
+
+    <select id="filtro-categoria"
+      style="padding:8px 12px;border:1px solid #cbd5e1;
+      border-radius:8px;font-size:0.9rem;background:#fff;">
+      <option value="todas">Todas categorias</option>
+      <option value="Trabalho">💼 Trabalho</option>
+      <option value="Pessoal">❤️ Pessoal</option>
+      <option value="Estudos">📚 Estudos</option>
+      <option value="Outro">📁 Outro</option>
+    </select>
+  </div>
+  
   <!-- Aqui o LAB 2 vai colocar a lista de itens -->
   <div id="lista-itens" style="margin-top:20px;"></div>
 </section>

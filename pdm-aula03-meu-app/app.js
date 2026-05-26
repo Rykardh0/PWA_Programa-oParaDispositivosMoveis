@@ -421,15 +421,16 @@ function salvarItens(lista) {
   console.log('[CRUD] Lista salva. Total:', lista.length);
 }
 
-// CREATE ou UPDATE — decide com base em idEmEdicao
+// CREATE ou UPDATE — agora também salva a categoria
 function adicionarItem() {
   var inputTitulo = document.getElementById('input-titulo');
   var inputDescricao = document.getElementById('input-descricao');
+  var inputCategoria = document.getElementById('input-categoria');
 
   var titulo = inputTitulo.value.trim();
   var descricao = inputDescricao.value.trim();
+  var categoria = inputCategoria.value; // Sempre tem valor (select)
 
-  // Validação
   if (titulo === '') {
     alert('O título não pode ficar vazio!');
     inputTitulo.focus();
@@ -439,42 +440,39 @@ function adicionarItem() {
   var itens = carregarItens();
 
   if (idEmEdicao === null) {
-    // ─── MODO CRIAR ───
+    // CRIAR
     var novoItem = {
       id: gerarId(),
       titulo: titulo,
       descricao: descricao,
+      categoria: categoria, // ★ NOVO CAMPO
       criadoEm: new Date().toLocaleString('pt-BR')
     };
     itens.push(novoItem);
     console.log('[CRUD] Criado:', novoItem);
   } else {
-    // ─── MODO EDITAR ───
-    // .find retorna referência ao item dentro do array.
-    // Alterando suas propriedades, alteramos no array.
+    // EDITAR
     var itemExistente = itens.find(function (i) {
       return i.id === idEmEdicao;
     });
     if (itemExistente) {
       itemExistente.titulo = titulo;
       itemExistente.descricao = descricao;
-      itemExistente.atualizadoEm =
-        new Date().toLocaleString('pt-BR');
+      itemExistente.categoria = categoria; // ★ NOVO CAMPO
+      itemExistente.atualizadoEm = new Date().toLocaleString('pt-BR');
       console.log('[CRUD] Atualizado:', idEmEdicao);
     }
-    // Volta para modo criar
     cancelarEdicao();
   }
 
   salvarItens(itens);
 
-  // Limpa o formulário (se ainda não foi limpo pelo cancelarEdicao)
   inputTitulo.value = '';
   inputDescricao.value = '';
+  inputCategoria.value = 'Outro'; // Volta ao padrão
   inputTitulo.focus();
 
   renderizarItens();
-  notificar('✅ Item criado', titulo);
 }
 
 // ── Conecta o botão "Adicionar" ──
@@ -495,13 +493,43 @@ if (campoTitulo) {
   });
 }
 
-// READ: mostra todos os itens na tela (AGORA com título clicável)
+// READ: mostra itens filtrados por busca e categoria
 function renderizarItens() {
   var container = document.getElementById('lista-itens');
   if (!container) return;
 
   var itens = carregarItens();
 
+  // ── ler busca e filtro (se existirem na tela) ──
+  var inputBusca = document.getElementById('input-busca');
+  var filtroCat = document.getElementById('filtro-categoria');
+  var termoBusca = inputBusca ? inputBusca.value.toLowerCase().trim() : '';
+  var categoriaSelecionada = filtroCat ? filtroCat.value : 'todas';
+
+  // ── aplicar filtros ──
+  var itensFiltrados = itens.filter(function (item) {
+    // Filtro de categoria
+    if (categoriaSelecionada !== 'todas') {
+      var catItem = item.categoria || 'Outro';
+      if (catItem !== categoriaSelecionada) return false;
+    }
+    // Filtro de busca (procura no título E na descrição)
+    if (termoBusca !== '') {
+      var titulo = (item.titulo || '').toLowerCase();
+      var desc = (item.descricao || '').toLowerCase();
+      if (titulo.indexOf(termoBusca) === -1
+          && desc.indexOf(termoBusca) === -1) {
+        return false;
+      }
+    }
+    return true; // passou em todos os filtros
+  });
+
+  console.log('[BUSCA] Filtrando:', termoBusca,
+    '| Cat:', categoriaSelecionada,
+    '| Resultados:', itensFiltrados.length);
+
+  // ── lista vazia (mensagens diferentes para "vazio" e "sem resultado") ──
   if (itens.length === 0) {
     container.innerHTML =
       '<p style="color:#64748b;font-size:0.9rem;'
@@ -509,28 +537,60 @@ function renderizarItens() {
       + 'Nenhum item criado ainda. Use o formulário acima!</p>';
     return;
   }
+  if (itensFiltrados.length === 0) {
+    container.innerHTML =
+      '<p style="color:#64748b;font-size:0.9rem;'
+      + 'text-align:center;padding:20px;">'
+      + '🔎 Nenhum item encontrado para "' + termoBusca + '"'
+      + ' na categoria selecionada.</p>';
+    return;
+  }
 
-  var html = '<p style="color:#475569;font-size:0.85rem;'
-    + 'margin-bottom:12px;">'
-    + '📊 Total: ' + itens.length + ' item(ns)'
-    + '</p>';
+  // ── contador (mostra "X de Y" se filtrado) ──
+  var html;
+  if (itensFiltrados.length === itens.length) {
+    html = '<p style="color:#475569;font-size:0.85rem;'
+      + 'margin-bottom:12px;">📊 Total: '
+      + itens.length + ' item(ns)</p>';
+  } else {
+    html = '<p style="color:#475569;font-size:0.85rem;'
+      + 'margin-bottom:12px;">🔎 Mostrando '
+      + itensFiltrados.length + ' de '
+      + itens.length + '</p>';
+  }
 
-  itens.forEach(function (item) {
+  // ── cores dos badges por categoria ──
+  var coresCat = {
+    'Trabalho': { bg: '#dbeafe', txt: '#1e40af', icon: '💼' },
+    'Pessoal':  { bg: '#fce7f3', txt: '#9d174d', icon: '❤️' },
+    'Estudos':  { bg: '#dcfce7', txt: '#166534', icon: '📚' },
+    'Outro':    { bg: '#f1f5f9', txt: '#475569', icon: '📁' }
+  };
+
+  // ── render cada card ──
+  itensFiltrados.forEach(function (item) {
+    var cat = item.categoria || 'Outro';
+    var cor = coresCat[cat] || coresCat['Outro'];
+
     html += '<div style="background:#fff;border:1px solid #e2e8f0;'
       + 'border-radius:8px;padding:12px;margin-bottom:10px;'
       + 'box-shadow:0 1px 3px rgba(0,0,0,0.05);">'
 
-      // ★ MUDANÇA: o título agora é CLICÁVEL (chama abrirDetalhes)
+      // Badge de categoria
+      + '<span style="display:inline-block;background:' + cor.bg + ';'
+      + 'color:' + cor.txt + ';padding:2px 8px;border-radius:999px;'
+      + 'font-size:0.72rem;font-weight:600;margin-bottom:6px;">'
+      + cor.icon + ' ' + cat + '</span>'
+
+      // Título clicável (LAB 1)
       + '<h3 style="color:#0f172a;font-size:1.05rem;'
       + 'margin-bottom:6px;cursor:pointer;'
       + 'text-decoration:underline;text-decoration-color:#94a3b8;" '
       + 'onclick="abrirDetalhes(\'' + item.id + '\')">'
       + item.titulo + ' 🔍</h3>'
 
-      // Descrição (corta em 80 chars para não poluir a lista)
       + (item.descricao
-        ? '<p style="color:#475569;font-size:0.9rem;'
-          + 'margin-bottom:8px;">'
+        ? '<p style="color:#475569;font-size:0.9rem;margin-bottom:8px;">'
           + (item.descricao.length > 80
               ? item.descricao.substring(0, 80) + '...'
               : item.descricao)
@@ -540,22 +600,21 @@ function renderizarItens() {
       + '<p style="color:#94a3b8;font-size:0.75rem;'
       + 'margin-bottom:10px;">⏰ ' + item.criadoEm + '</p>'
 
-      // Botões de ação (continuam iguais)
       + '<div style="display:flex;gap:6px;flex-wrap:wrap;">'
       + '<button onclick="editarItem(\'' + item.id + '\')" '
       + 'style="padding:6px 12px;background:#fbbf24;color:#000;'
-      + 'border:none;border-radius:6px;cursor:pointer;'
-      + 'font-size:0.85rem;">✏️ Editar</button>'
+      + 'border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;">'
+      + '✏️ Editar</button>'
 
       + '<button onclick="excluirItem(\'' + item.id + '\')" '
       + 'style="padding:6px 12px;background:#ef4444;color:#fff;'
-      + 'border:none;border-radius:6px;cursor:pointer;'
-      + 'font-size:0.85rem;">🗑️ Excluir</button>'
+      + 'border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;">'
+      + '🗑️ Excluir</button>'
 
       + '<button onclick="compartilharItem(\'' + item.id + '\')" '
       + 'style="padding:6px 12px;background:#3b82f6;color:#fff;'
-      + 'border:none;border-radius:6px;cursor:pointer;'
-      + 'font-size:0.85rem;">📤 Compartilhar</button>'
+      + 'border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;">'
+      + '📤 Compartilhar</button>'
 
       + '</div></div>';
   });
@@ -592,9 +651,8 @@ function excluirItem(id) {
 // string com id = modo "editar item existente"
 var idEmEdicao = null;
 
-// ── UPDATE - Parte 1: preparar o formulário para edição ──
+// UPDATE - Parte 1: preparar o formulário para edição (AGORA com categoria)
 function editarItem(id) {
-  // Acha o item na lista pelo id
   var itens = carregarItens();
   var item = itens.find(function (i) {
     return i.id === id;
@@ -605,28 +663,23 @@ function editarItem(id) {
     return;
   }
 
-  // Preenche o formulário com os dados do item
   document.getElementById('input-titulo').value = item.titulo;
   document.getElementById('input-descricao').value = item.descricao || '';
+  // ★ Preenche a categoria (se item antigo não tem, usa 'Outro')
+  document.getElementById('input-categoria').value = item.categoria || 'Outro';
 
-  // Guarda o id em edição (variável global)
   idEmEdicao = id;
 
-  // Muda o botão Adicionar para Salvar Edição
   var btnAdd = document.getElementById('btn-adicionar');
   btnAdd.textContent = '💾 Salvar Edição';
   btnAdd.style.background =
     'linear-gradient(135deg,#f59e0b,#fbbf24)';
 
-  // Mostra o botão Cancelar
-  document.getElementById('btn-cancelar').style.display =
-    'inline-block';
+  document.getElementById('btn-cancelar').style.display = 'inline-block';
 
-  // Rola a tela para o formulário
   document.getElementById('secao-crud')
     .scrollIntoView({ behavior: 'smooth' });
 
-  // Coloca o cursor no campo de título
   document.getElementById('input-titulo').focus();
 
   console.log('[CRUD] Modo edição:', id);
@@ -833,3 +886,14 @@ window.addEventListener('hashchange', processarRota);
 // ── Processa a rota ao carregar a página (importante para F5 funcionar) ──
 processarRota();
 
+// ── AV2 - busca em tempo real + filtro de categoria ──
+var campoBusca = document.getElementById('input-busca');
+if (campoBusca) {
+  // 'input' dispara a cada caractere digitado
+  campoBusca.addEventListener('input', renderizarItens);
+}
+
+var filtroCat = document.getElementById('filtro-categoria');
+if (filtroCat) {
+  filtroCat.addEventListener('change', renderizarItens);
+}
