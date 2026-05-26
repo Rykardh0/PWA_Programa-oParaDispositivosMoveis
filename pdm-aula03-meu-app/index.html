@@ -201,7 +201,7 @@
   <option value="Pessoal">❤️ Pessoal</option>
   <option value="Estudos">📚 Estudos</option>
   </select>
-  
+
    <!-- AV2 - Botão de localização -->
   <div style="margin-bottom:12px;display:flex;gap:8px;
     align-items:center;flex-wrap:wrap;">
@@ -215,6 +215,25 @@
       style="font-size:0.85rem;color:#64748b;">
       Nenhuma localização anexada
     </span>
+  </div>
+
+    <!-- AV2 - Input de foto -->
+  <div style="margin-bottom:12px;">
+    <label for="input-foto"
+      style="display:inline-block;padding:8px 16px;
+      background:#a855f7;color:#fff;border:none;
+      border-radius:8px;cursor:pointer;font-size:0.9rem;">
+      📸 Adicionar foto
+    </label>
+    <input id="input-foto" type="file"
+      accept="image/*" capture="environment"
+      style="display:none;">
+    <span id="status-foto"
+      style="margin-left:8px;font-size:0.85rem;color:#64748b;">
+      Nenhuma foto
+    </span>
+    <div id="preview-foto"
+      style="margin-top:8px;"></div>
   </div>
 
   <!-- Botão de adicionar (type=button para NÃO recarregar a página!) -->

@@ -421,7 +421,7 @@ function salvarItens(lista) {
   console.log('[CRUD] Lista salva. Total:', lista.length);
 }
 
-// CREATE ou UPDATE — agora também salva a localização (se houver)
+// CREATE ou UPDATE — agora também salva a foto (se houver)
 function adicionarItem() {
   var inputTitulo = document.getElementById('input-titulo');
   var inputDescricao = document.getElementById('input-descricao');
@@ -446,11 +446,12 @@ function adicionarItem() {
       titulo: titulo,
       descricao: descricao,
       categoria: categoria,
-      localizacao: localizacaoPendente, // ★ NOVO (pode ser null)
+      localizacao: localizacaoPendente,
+      foto: fotoPendente, // ★ NOVO (pode ser null)
       criadoEm: new Date().toLocaleString('pt-BR')
     };
     itens.push(novoItem);
-    console.log('[CRUD] Criado:', novoItem);
+    console.log('[CRUD] Criado:', novoItem.titulo);
   } else {
     // EDITAR
     var itemExistente = itens.find(function (i) {
@@ -460,23 +461,30 @@ function adicionarItem() {
       itemExistente.titulo = titulo;
       itemExistente.descricao = descricao;
       itemExistente.categoria = categoria;
-      // Só atualiza localização se nova foi capturada na edição
-      if (localizacaoPendente) {
-        itemExistente.localizacao = localizacaoPendente;
-      }
+      if (localizacaoPendente) itemExistente.localizacao = localizacaoPendente;
+      if (fotoPendente) itemExistente.foto = fotoPendente;
       itemExistente.atualizadoEm = new Date().toLocaleString('pt-BR');
       console.log('[CRUD] Atualizado:', idEmEdicao);
     }
     cancelarEdicao();
   }
 
-  salvarItens(itens);
+  // ★ TRY/CATCH protege contra QuotaExceededError
+  try {
+    salvarItens(itens);
+  } catch (erro) {
+    alert('⚠️ Espaço esgotado no localStorage!\n\n'
+      + 'Você atingiu o limite de ~5MB. '
+      + 'Exclua alguns itens com foto antes de criar mais.');
+    console.log('[CRUD] Erro ao salvar:', erro);
+    return;
+  }
 
-  // Limpa o formulário
   inputTitulo.value = '';
   inputDescricao.value = '';
   inputCategoria.value = 'Outro';
-  limparLocalizacaoPendente(); // ★ limpa a localização pendente
+  limparLocalizacaoPendente();
+  limparFotoPendente(); // ★ limpa a foto pendente
   inputTitulo.focus();
 
   renderizarItens();
@@ -500,27 +508,23 @@ if (campoTitulo) {
   });
 }
 
-// READ: mostra itens filtrados por busca e categoria
+// READ: mostra itens filtrados com miniatura de foto (se houver)
 function renderizarItens() {
   var container = document.getElementById('lista-itens');
   if (!container) return;
 
   var itens = carregarItens();
 
-  // ── ler busca e filtro (se existirem na tela) ──
   var inputBusca = document.getElementById('input-busca');
   var filtroCat = document.getElementById('filtro-categoria');
   var termoBusca = inputBusca ? inputBusca.value.toLowerCase().trim() : '';
   var categoriaSelecionada = filtroCat ? filtroCat.value : 'todas';
 
-  // ── aplicar filtros ──
   var itensFiltrados = itens.filter(function (item) {
-    // Filtro de categoria
     if (categoriaSelecionada !== 'todas') {
       var catItem = item.categoria || 'Outro';
       if (catItem !== categoriaSelecionada) return false;
     }
-    // Filtro de busca (procura no título E na descrição)
     if (termoBusca !== '') {
       var titulo = (item.titulo || '').toLowerCase();
       var desc = (item.descricao || '').toLowerCase();
@@ -529,14 +533,11 @@ function renderizarItens() {
         return false;
       }
     }
-    return true; // passou em todos os filtros
+    return true;
   });
 
-  console.log('[BUSCA] Filtrando:', termoBusca,
-    '| Cat:', categoriaSelecionada,
-    '| Resultados:', itensFiltrados.length);
+  console.log('[BUSCA] Resultados:', itensFiltrados.length, '/', itens.length);
 
-  // ── lista vazia (mensagens diferentes para "vazio" e "sem resultado") ──
   if (itens.length === 0) {
     container.innerHTML =
       '<p style="color:#64748b;font-size:0.9rem;'
@@ -548,25 +549,19 @@ function renderizarItens() {
     container.innerHTML =
       '<p style="color:#64748b;font-size:0.9rem;'
       + 'text-align:center;padding:20px;">'
-      + '🔎 Nenhum item encontrado para "' + termoBusca + '"'
-      + ' na categoria selecionada.</p>';
+      + '🔎 Nenhum item encontrado.</p>';
     return;
   }
 
-  // ── contador (mostra "X de Y" se filtrado) ──
   var html;
   if (itensFiltrados.length === itens.length) {
-    html = '<p style="color:#475569;font-size:0.85rem;'
-      + 'margin-bottom:12px;">📊 Total: '
-      + itens.length + ' item(ns)</p>';
+    html = '<p style="color:#475569;font-size:0.85rem;margin-bottom:12px;">'
+      + '📊 Total: ' + itens.length + ' item(ns)</p>';
   } else {
-    html = '<p style="color:#475569;font-size:0.85rem;'
-      + 'margin-bottom:12px;">🔎 Mostrando '
-      + itensFiltrados.length + ' de '
-      + itens.length + '</p>';
+    html = '<p style="color:#475569;font-size:0.85rem;margin-bottom:12px;">'
+      + '🔎 Mostrando ' + itensFiltrados.length + ' de ' + itens.length + '</p>';
   }
 
-  // ── cores dos badges por categoria ──
   var coresCat = {
     'Trabalho': { bg: '#dbeafe', txt: '#1e40af', icon: '💼' },
     'Pessoal':  { bg: '#fce7f3', txt: '#9d174d', icon: '❤️' },
@@ -574,56 +569,74 @@ function renderizarItens() {
     'Outro':    { bg: '#f1f5f9', txt: '#475569', icon: '📁' }
   };
 
-  // ── render cada card ──
   itensFiltrados.forEach(function (item) {
     var cat = item.categoria || 'Outro';
     var cor = coresCat[cat] || coresCat['Outro'];
 
     html += '<div style="background:#fff;border:1px solid #e2e8f0;'
       + 'border-radius:8px;padding:12px;margin-bottom:10px;'
-      + 'box-shadow:0 1px 3px rgba(0,0,0,0.05);">'
+      + 'box-shadow:0 1px 3px rgba(0,0,0,0.05);'
+      + 'display:flex;gap:12px;">';
 
-      // Badge de categoria
-      + '<span style="display:inline-block;background:' + cor.bg + ';'
+    // ★ Miniatura de foto (se tiver)
+    if (item.foto) {
+      html += '<img src="' + item.foto + '" '
+        + 'onclick="abrirDetalhes(\'' + item.id + '\')" '
+        + 'style="width:64px;height:64px;object-fit:cover;'
+        + 'border-radius:6px;cursor:pointer;flex-shrink:0;">';
+    }
+
+    // Conteúdo do card
+    html += '<div style="flex:1;min-width:0;">';
+
+    html += '<span style="display:inline-block;background:' + cor.bg + ';'
       + 'color:' + cor.txt + ';padding:2px 8px;border-radius:999px;'
       + 'font-size:0.72rem;font-weight:600;margin-bottom:6px;">'
-      + cor.icon + ' ' + cat + '</span>'
+      + cor.icon + ' ' + cat + '</span>';
 
-      // Título clicável (LAB 1)
-      + '<h3 style="color:#0f172a;font-size:1.05rem;'
+    // Indicadores de mídia (📍 se tem localização, 📸 se tem foto)
+    if (item.localizacao) {
+      html += '<span style="margin-left:6px;font-size:0.72rem;'
+        + 'color:#0284c7;">📍</span>';
+    }
+    if (item.foto) {
+      html += '<span style="margin-left:4px;font-size:0.72rem;'
+        + 'color:#a855f7;">📸</span>';
+    }
+
+    html += '<h3 style="color:#0f172a;font-size:1.05rem;'
       + 'margin-bottom:6px;cursor:pointer;'
       + 'text-decoration:underline;text-decoration-color:#94a3b8;" '
       + 'onclick="abrirDetalhes(\'' + item.id + '\')">'
-      + item.titulo + ' 🔍</h3>'
+      + item.titulo + ' 🔍</h3>';
 
-      + (item.descricao
-        ? '<p style="color:#475569;font-size:0.9rem;margin-bottom:8px;">'
-          + (item.descricao.length > 80
-              ? item.descricao.substring(0, 80) + '...'
-              : item.descricao)
-          + '</p>'
-        : '')
+    if (item.descricao) {
+      html += '<p style="color:#475569;font-size:0.9rem;margin-bottom:8px;">'
+        + (item.descricao.length > 80
+            ? item.descricao.substring(0, 80) + '...'
+            : item.descricao)
+        + '</p>';
+    }
 
-      + '<p style="color:#94a3b8;font-size:0.75rem;'
-      + 'margin-bottom:10px;">⏰ ' + item.criadoEm + '</p>'
+    html += '<p style="color:#94a3b8;font-size:0.75rem;margin-bottom:10px;">'
+      + '⏰ ' + item.criadoEm + '</p>';
 
-      + '<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+    html += '<div style="display:flex;gap:6px;flex-wrap:wrap;">'
       + '<button onclick="editarItem(\'' + item.id + '\')" '
       + 'style="padding:6px 12px;background:#fbbf24;color:#000;'
       + 'border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;">'
       + '✏️ Editar</button>'
-
       + '<button onclick="excluirItem(\'' + item.id + '\')" '
       + 'style="padding:6px 12px;background:#ef4444;color:#fff;'
       + 'border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;">'
       + '🗑️ Excluir</button>'
-
       + '<button onclick="compartilharItem(\'' + item.id + '\')" '
       + 'style="padding:6px 12px;background:#3b82f6;color:#fff;'
       + 'border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;">'
       + '📤 Compartilhar</button>'
+      + '</div>';
 
-      + '</div></div>';
+    html += '</div></div>'; // fecha conteúdo + card
   });
 
   container.innerHTML = html;
@@ -805,40 +818,42 @@ function processarRota() {
   window.scrollTo(0, 0);
 }
 
-// Monta o HTML da tela de detalhes (AGORA com localização)
+// Detalhes do item (AGORA com foto grande)
 function mostrarDetalhes(id) {
   var itens = carregarItens();
-  var item = itens.find(function (i) {
-    return i.id === id;
-  });
+  var item = itens.find(function (i) { return i.id === id; });
 
   var container = document.getElementById('conteudo-detalhes');
 
   if (!item) {
     container.innerHTML =
       '<p style="color:#dc2626;padding:20px;text-align:center;">'
-      + '⚠️ Item não encontrado. Pode ter sido excluído.</p>';
+      + '⚠️ Item não encontrado.</p>';
     return;
   }
 
   var html = '<h1 style="font-size:1.8rem;color:#0f172a;'
     + 'margin-bottom:12px;">' + item.titulo + '</h1>';
 
-  // Categoria
   if (item.categoria) {
     html += '<p style="color:#64748b;font-size:0.9rem;'
       + 'margin-bottom:16px;">Categoria: '
       + '<strong>' + item.categoria + '</strong></p>';
   }
 
-  // Descrição
+  // ★ FOTO em tamanho grande
+  if (item.foto) {
+    html += '<img src="' + item.foto + '" '
+      + 'style="width:100%;max-width:500px;border-radius:8px;'
+      + 'border:1px solid #cbd5e1;margin-bottom:16px;display:block;">';
+  }
+
   if (item.descricao) {
     html += '<p style="color:#334155;font-size:1.05rem;'
       + 'line-height:1.7;margin-bottom:20px;'
       + 'white-space:pre-wrap;">' + item.descricao + '</p>';
   }
 
-  // ★ LOCALIZAÇÃO (se houver)
   if (item.localizacao) {
     var lat = item.localizacao.lat;
     var lng = item.localizacao.lng;
@@ -852,11 +867,9 @@ function mostrarDetalhes(id) {
       + 'style="display:inline-block;margin-top:8px;'
       + 'background:#1e40af;color:#fff;padding:6px 14px;'
       + 'border-radius:6px;text-decoration:none;font-size:0.85rem;">'
-      + '🗺️ Abrir no Google Maps</a>'
-      + '</div>';
+      + '🗺️ Abrir no Google Maps</a></div>';
   }
 
-  // Metadados
   html += '<div style="background:#fef3c7;padding:12px;'
     + 'border-radius:8px;font-size:0.85rem;color:#78350f;'
     + 'margin-bottom:20px;">'
@@ -865,10 +878,8 @@ function mostrarDetalhes(id) {
     html += '<p>✏️ Editado em: ' + item.atualizadoEm + '</p>';
   }
   html += '<p style="color:#92400e;font-family:monospace;'
-    + 'font-size:0.75rem;margin-top:6px;">'
-    + 'ID: ' + item.id + '</p></div>';
+    + 'font-size:0.75rem;margin-top:6px;">ID: ' + item.id + '</p></div>';
 
-  // Botões
   html += '<div style="display:flex;gap:8px;flex-wrap:wrap;">'
     + '<button onclick="editarItem(\'' + item.id + '\');voltarParaLista();" '
     + 'style="padding:10px 20px;background:#fbbf24;color:#000;'
@@ -881,8 +892,7 @@ function mostrarDetalhes(id) {
     + '<button onclick="compartilharItem(\'' + item.id + '\')" '
     + 'style="padding:10px 20px;background:#3b82f6;color:#fff;'
     + 'border:none;border-radius:8px;cursor:pointer;font-size:0.95rem;'
-    + 'font-weight:600;">📤 Compartilhar</button>'
-    + '</div>';
+    + 'font-weight:600;">📤 Compartilhar</button></div>';
 
   container.innerHTML = html;
 }
@@ -1011,4 +1021,134 @@ function limparLocalizacaoPendente() {
 var btnLoc = document.getElementById('btn-localizacao');
 if (btnLoc) {
   btnLoc.addEventListener('click', capturarLocalizacao);
+}
+
+// ═══ AV2 - FOTO COM COMPRESSÃO ═══
+// Pipeline: arquivo → FileReader → Image → Canvas redimensiona → JPEG 70%
+// Resultado: foto de 3MB vira ~80KB. Cabe muito mais no localStorage.
+
+// Variável que guarda a foto "pendente" (base64 comprimido)
+var fotoPendente = null;
+
+// Configurações de compressão
+var FOTO_MAX_DIMENSAO = 800;   // px (lado maior)
+var FOTO_QUALIDADE = 0.7;      // 0..1 (0.7 é equilíbrio bom)
+
+// ── Função: comprime uma imagem usando Canvas ──
+// Recebe o arquivo (File) e chama callback com a string base64
+function comprimirImagem(arquivo, callback) {
+  // 1) FileReader lê o arquivo do disco
+  var reader = new FileReader();
+
+  reader.onload = function (e) {
+    // 2) Cria um objeto Image com os dados do arquivo
+    var img = new Image();
+    img.onload = function () {
+      // 3) Calcula novas dimensões mantendo proporção
+      var largura = img.width;
+      var altura = img.height;
+      if (largura > altura) {
+        if (largura > FOTO_MAX_DIMENSAO) {
+          altura = altura * (FOTO_MAX_DIMENSAO / largura);
+          largura = FOTO_MAX_DIMENSAO;
+        }
+      } else {
+        if (altura > FOTO_MAX_DIMENSAO) {
+          largura = largura * (FOTO_MAX_DIMENSAO / altura);
+          altura = FOTO_MAX_DIMENSAO;
+        }
+      }
+
+      // 4) Cria um canvas off-screen e desenha a imagem nele já redimensionada
+      var canvas = document.createElement('canvas');
+      canvas.width = largura;
+      canvas.height = altura;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, largura, altura);
+
+      // 5) Converte para JPEG comprimido em base64
+      var base64 = canvas.toDataURL('image/jpeg', FOTO_QUALIDADE);
+
+      // 6) Devolve via callback
+      callback(base64);
+    };
+    img.onerror = function () {
+      callback(null);
+      alert('Erro ao carregar a imagem.');
+    };
+    img.src = e.target.result;
+  };
+
+  reader.onerror = function () {
+    callback(null);
+    alert('Erro ao ler o arquivo.');
+  };
+
+  reader.readAsDataURL(arquivo);
+}
+
+// ── Função: trata seleção do arquivo ──
+function tratarFoto(evento) {
+  var arquivo = evento.target.files[0];
+  if (!arquivo) return;
+
+  // Validação básica: deve ser imagem
+  if (!arquivo.type.startsWith('image/')) {
+    alert('Arquivo selecionado não é uma imagem.');
+    return;
+  }
+
+  var status = document.getElementById('status-foto');
+  var preview = document.getElementById('preview-foto');
+
+  status.textContent = '⏳ Comprimindo...';
+  status.style.color = '#f59e0b';
+
+  // Mostra o tamanho original
+  var kbOriginal = Math.round(arquivo.size / 1024);
+  console.log('[FOTO] Arquivo original:', kbOriginal + 'KB');
+
+  // Comprime
+  comprimirImagem(arquivo, function (base64) {
+    if (!base64) {
+      status.textContent = '❌ Erro';
+      status.style.color = '#dc2626';
+      return;
+    }
+
+    fotoPendente = base64;
+
+    // Calcula tamanho final (base64 string length aproximada)
+    var kbFinal = Math.round(base64.length / 1024);
+    console.log('[FOTO] Foto comprimida:', kbFinal + 'KB',
+      '(' + Math.round((kbFinal / kbOriginal) * 100) + '% do original)');
+
+    status.textContent = '✅ ' + kbFinal + 'KB';
+    status.style.color = '#10b981';
+
+    // Mostra preview
+    preview.innerHTML = '<img src="' + base64 + '" '
+      + 'style="max-width:200px;max-height:200px;'
+      + 'border-radius:8px;border:1px solid #cbd5e1;">';
+  });
+}
+
+// ── Função: limpa a foto pendente ──
+function limparFotoPendente() {
+  fotoPendente = null;
+  var status = document.getElementById('status-foto');
+  var preview = document.getElementById('preview-foto');
+  var input = document.getElementById('input-foto');
+  if (status) {
+    status.textContent = 'Nenhuma foto';
+    status.style.color = '#64748b';
+  }
+  if (preview) preview.innerHTML = '';
+  if (input) input.value = ''; // limpa o input (importante!)
+}
+
+// ── Conecta o input ──
+var inputFoto = document.getElementById('input-foto');
+if (inputFoto) {
+  inputFoto.addEventListener('change', tratarFoto);
 }
