@@ -1152,3 +1152,52 @@ var inputFoto = document.getElementById('input-foto');
 if (inputFoto) {
   inputFoto.addEventListener('change', tratarFoto);
 }
+
+// ═══ AV2 - TEMA CLARO / ESCURO ═══
+// Persiste no localStorage. Respeita preferência do sistema na 1ª visita.
+
+var CHAVE_TEMA = 'meuapp.tema';
+
+// ── Aplica um tema ('claro' ou 'escuro') ──
+function aplicarTema(tema) {
+  var btn = document.getElementById('btn-tema');
+  if (tema === 'escuro') {
+    document.body.classList.add('dark');
+    if (btn) btn.textContent = '☀️ Claro';
+  } else {
+    document.body.classList.remove('dark');
+    if (btn) btn.textContent = '🌙 Escuro';
+  }
+  // Salva a escolha
+  localStorage.setItem(CHAVE_TEMA, tema);
+  console.log('[TEMA] Tema aplicado:', tema);
+}
+
+// ── Alterna entre claro e escuro ──
+function alternarTema() {
+  var atual = localStorage.getItem(CHAVE_TEMA) || 'claro';
+  var novo = atual === 'escuro' ? 'claro' : 'escuro';
+  aplicarTema(novo);
+}
+
+// ── Conecta o botão ──
+var btnTema = document.getElementById('btn-tema');
+if (btnTema) {
+  btnTema.addEventListener('click', alternarTema);
+}
+
+// ── Ao abrir, aplica o tema salvo (ou usa preferência do sistema) ──
+(function inicializarTema() {
+  var temaSalvo = localStorage.getItem(CHAVE_TEMA);
+
+  if (temaSalvo) {
+    // Usuário já escolheu antes
+    aplicarTema(temaSalvo);
+  } else {
+    // Primeira visita: detecta preferência do sistema
+    // 'prefers-color-scheme: dark' → sistema está em modo escuro?
+    var sistemaEscuro = window.matchMedia
+      && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    aplicarTema(sistemaEscuro ? 'escuro' : 'claro');
+  }
+})();

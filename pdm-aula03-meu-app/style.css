@@ -121,4 +121,60 @@ div.apidiv p{
 font-size:0.9rem;
 }
 
+/* ═══ AV2 - TEMA CLARO / ESCURO ═══ */
 
+/* Variáveis padrão (tema CLARO) */
+:root {
+  --cor-fundo: #f8fafc;
+  --cor-texto: #0f172a;
+  --cor-card: #ffffff;
+  --cor-borda: #e2e8f0;
+  --cor-secao: #f1f5f9;
+}
+
+/* Quando o body tem a classe "dark", trocamos as variáveis */
+body.dark {
+  --cor-fundo: #0f172a;
+  --cor-texto: #f1f5f9;
+  --cor-card: #1e293b;
+  --cor-borda: #334155;
+  --cor-secao: #1e293b;
+}
+
+/* Aplica as variáveis ao body */
+body {
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Botão de alternar tema (canto superior) */
+#btn-tema {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  padding: 10px 16px;
+  background: var(--cor-card);
+  color: var(--cor-texto);
+  border: 1px solid var(--cor-borda);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 100;
+  transition: all 0.2s;
+}
+
+#btn-tema:hover {
+  transform: scale(1.05);
+}
+
+/* No tema escuro, ajusta as seções coloridas (favoritos, notif, CRUD) */
+body.dark section[id="meus-favoritos"],
+body.dark section[id="secao-notificacoes"],
+body.dark section[id="secao-crud"],
+body.dark section[id="tela-detalhes"],
+body.dark section[id="dados-api"] {
+  filter: brightness(0.9);
+}
