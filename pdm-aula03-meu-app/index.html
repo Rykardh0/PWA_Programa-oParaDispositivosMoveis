@@ -201,6 +201,21 @@
   <option value="Pessoal">❤️ Pessoal</option>
   <option value="Estudos">📚 Estudos</option>
   </select>
+  
+   <!-- AV2 - Botão de localização -->
+  <div style="margin-bottom:12px;display:flex;gap:8px;
+    align-items:center;flex-wrap:wrap;">
+    <button id="btn-localizacao" type="button"
+      style="padding:8px 16px;background:#0ea5e9;color:#fff;
+      border:none;border-radius:8px;cursor:pointer;
+      font-size:0.9rem;">
+      📍 Anexar localização
+    </button>
+    <span id="status-localizacao"
+      style="font-size:0.85rem;color:#64748b;">
+      Nenhuma localização anexada
+    </span>
+  </div>
 
   <!-- Botão de adicionar (type=button para NÃO recarregar a página!) -->
   <button id="btn-adicionar" type="button"
@@ -237,7 +252,7 @@
       <option value="Outro">📁 Outro</option>
     </select>
   </div>
-  
+
   <!-- Aqui o LAB 2 vai colocar a lista de itens -->
   <div id="lista-itens" style="margin-top:20px;"></div>
 </section>

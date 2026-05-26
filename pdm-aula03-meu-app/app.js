@@ -421,7 +421,7 @@ function salvarItens(lista) {
   console.log('[CRUD] Lista salva. Total:', lista.length);
 }
 
-// CREATE ou UPDATE — agora também salva a categoria
+// CREATE ou UPDATE — agora também salva a localização (se houver)
 function adicionarItem() {
   var inputTitulo = document.getElementById('input-titulo');
   var inputDescricao = document.getElementById('input-descricao');
@@ -429,7 +429,7 @@ function adicionarItem() {
 
   var titulo = inputTitulo.value.trim();
   var descricao = inputDescricao.value.trim();
-  var categoria = inputCategoria.value; // Sempre tem valor (select)
+  var categoria = inputCategoria.value;
 
   if (titulo === '') {
     alert('O título não pode ficar vazio!');
@@ -445,7 +445,8 @@ function adicionarItem() {
       id: gerarId(),
       titulo: titulo,
       descricao: descricao,
-      categoria: categoria, // ★ NOVO CAMPO
+      categoria: categoria,
+      localizacao: localizacaoPendente, // ★ NOVO (pode ser null)
       criadoEm: new Date().toLocaleString('pt-BR')
     };
     itens.push(novoItem);
@@ -458,7 +459,11 @@ function adicionarItem() {
     if (itemExistente) {
       itemExistente.titulo = titulo;
       itemExistente.descricao = descricao;
-      itemExistente.categoria = categoria; // ★ NOVO CAMPO
+      itemExistente.categoria = categoria;
+      // Só atualiza localização se nova foi capturada na edição
+      if (localizacaoPendente) {
+        itemExistente.localizacao = localizacaoPendente;
+      }
       itemExistente.atualizadoEm = new Date().toLocaleString('pt-BR');
       console.log('[CRUD] Atualizado:', idEmEdicao);
     }
@@ -467,9 +472,11 @@ function adicionarItem() {
 
   salvarItens(itens);
 
+  // Limpa o formulário
   inputTitulo.value = '';
   inputDescricao.value = '';
-  inputCategoria.value = 'Outro'; // Volta ao padrão
+  inputCategoria.value = 'Outro';
+  limparLocalizacaoPendente(); // ★ limpa a localização pendente
   inputTitulo.focus();
 
   renderizarItens();
@@ -798,7 +805,7 @@ function processarRota() {
   window.scrollTo(0, 0);
 }
 
-// ── Função: monta o HTML da tela de detalhes ──
+// Monta o HTML da tela de detalhes (AGORA com localização)
 function mostrarDetalhes(id) {
   var itens = carregarItens();
   var item = itens.find(function (i) {
@@ -807,7 +814,6 @@ function mostrarDetalhes(id) {
 
   var container = document.getElementById('conteudo-detalhes');
 
-  // Se o item não existe (foi excluído), mostra mensagem
   if (!item) {
     container.innerHTML =
       '<p style="color:#dc2626;padding:20px;text-align:center;">'
@@ -815,15 +821,39 @@ function mostrarDetalhes(id) {
     return;
   }
 
-  // Monta HTML detalhado (título grande, descrição completa, data)
   var html = '<h1 style="font-size:1.8rem;color:#0f172a;'
     + 'margin-bottom:12px;">' + item.titulo + '</h1>';
 
-  // Descrição (se tiver)
+  // Categoria
+  if (item.categoria) {
+    html += '<p style="color:#64748b;font-size:0.9rem;'
+      + 'margin-bottom:16px;">Categoria: '
+      + '<strong>' + item.categoria + '</strong></p>';
+  }
+
+  // Descrição
   if (item.descricao) {
     html += '<p style="color:#334155;font-size:1.05rem;'
       + 'line-height:1.7;margin-bottom:20px;'
       + 'white-space:pre-wrap;">' + item.descricao + '</p>';
+  }
+
+  // ★ LOCALIZAÇÃO (se houver)
+  if (item.localizacao) {
+    var lat = item.localizacao.lat;
+    var lng = item.localizacao.lng;
+    var url = 'https://www.google.com/maps?q=' + lat + ',' + lng;
+    html += '<div style="background:#dbeafe;padding:12px;'
+      + 'border-radius:8px;margin-bottom:16px;">'
+      + '<p style="color:#1e40af;font-weight:600;">📍 Localização</p>'
+      + '<p style="color:#1e3a8a;font-size:0.9rem;font-family:monospace;">'
+      + lat.toFixed(6) + ', ' + lng.toFixed(6) + '</p>'
+      + '<a href="' + url + '" target="_blank" '
+      + 'style="display:inline-block;margin-top:8px;'
+      + 'background:#1e40af;color:#fff;padding:6px 14px;'
+      + 'border-radius:6px;text-decoration:none;font-size:0.85rem;">'
+      + '🗺️ Abrir no Google Maps</a>'
+      + '</div>';
   }
 
   // Metadados
@@ -831,34 +861,27 @@ function mostrarDetalhes(id) {
     + 'border-radius:8px;font-size:0.85rem;color:#78350f;'
     + 'margin-bottom:20px;">'
     + '<p>⏰ Criado em: ' + item.criadoEm + '</p>';
-
   if (item.atualizadoEm) {
     html += '<p>✏️ Editado em: ' + item.atualizadoEm + '</p>';
   }
-
   html += '<p style="color:#92400e;font-family:monospace;'
     + 'font-size:0.75rem;margin-top:6px;">'
-    + 'ID: ' + item.id + '</p>'
-    + '</div>';
+    + 'ID: ' + item.id + '</p></div>';
 
-  // Botões de ação
+  // Botões
   html += '<div style="display:flex;gap:8px;flex-wrap:wrap;">'
-
     + '<button onclick="editarItem(\'' + item.id + '\');voltarParaLista();" '
     + 'style="padding:10px 20px;background:#fbbf24;color:#000;'
-    + 'border:none;border-radius:8px;cursor:pointer;'
-    + 'font-size:0.95rem;font-weight:600;">✏️ Editar</button>'
-
+    + 'border:none;border-radius:8px;cursor:pointer;font-size:0.95rem;'
+    + 'font-weight:600;">✏️ Editar</button>'
     + '<button onclick="if(confirm(\'Excluir?\')){excluirItem(\'' + item.id + '\');voltarParaLista();}" '
     + 'style="padding:10px 20px;background:#ef4444;color:#fff;'
-    + 'border:none;border-radius:8px;cursor:pointer;'
-    + 'font-size:0.95rem;font-weight:600;">🗑️ Excluir</button>'
-
+    + 'border:none;border-radius:8px;cursor:pointer;font-size:0.95rem;'
+    + 'font-weight:600;">🗑️ Excluir</button>'
     + '<button onclick="compartilharItem(\'' + item.id + '\')" '
     + 'style="padding:10px 20px;background:#3b82f6;color:#fff;'
-    + 'border:none;border-radius:8px;cursor:pointer;'
-    + 'font-size:0.95rem;font-weight:600;">📤 Compartilhar</button>'
-
+    + 'border:none;border-radius:8px;cursor:pointer;font-size:0.95rem;'
+    + 'font-weight:600;">📤 Compartilhar</button>'
     + '</div>';
 
   container.innerHTML = html;
@@ -896,4 +919,96 @@ if (campoBusca) {
 var filtroCat = document.getElementById('filtro-categoria');
 if (filtroCat) {
   filtroCat.addEventListener('change', renderizarItens);
+}
+
+// ═══ AV2 - GEOLOCALIZAÇÃO ═══
+// Captura a localização atual usando a Geolocation API.
+// A localização capturada fica em variável temporária e é
+// anexada ao próximo item criado.
+
+// Variável que guarda a localização "pendente" (a ser anexada)
+var localizacaoPendente = null;
+
+// ── Função: captura a localização atual ──
+function capturarLocalizacao() {
+  var status = document.getElementById('status-localizacao');
+
+  // Verifica suporte
+  if (!navigator.geolocation) {
+    alert('Seu navegador não suporta Geolocation API.');
+    return;
+  }
+
+  // Feedback visual de "carregando"
+  status.textContent = '⏳ Capturando...';
+  status.style.color = '#f59e0b';
+
+  // Chamada principal: pede a posição ao navegador
+  // getCurrentPosition(sucesso, erro, opcoes)
+  navigator.geolocation.getCurrentPosition(
+    // CALLBACK DE SUCESSO
+    function (position) {
+      var lat = position.coords.latitude;
+      var lng = position.coords.longitude;
+      var precisao = Math.round(position.coords.accuracy);
+
+      // Guarda na variável global
+      localizacaoPendente = {
+        lat: lat,
+        lng: lng,
+        precisao: precisao,
+        capturadaEm: new Date().toLocaleString('pt-BR')
+      };
+
+      // Mostra na tela com 5 casas decimais (precisão de ~1m)
+      status.innerHTML = '✅ ' + lat.toFixed(5) + ', ' + lng.toFixed(5)
+        + ' (±' + precisao + 'm)';
+      status.style.color = '#10b981';
+
+      console.log('[GEO] Localização capturada:', localizacaoPendente);
+    },
+    // CALLBACK DE ERRO
+    function (erro) {
+      var msg = 'Erro ao capturar localização: ';
+      switch (erro.code) {
+        case erro.PERMISSION_DENIED:
+          msg += 'permissão negada. Clique no cadeado da URL → Permissões → Localização → Permitir';
+          break;
+        case erro.POSITION_UNAVAILABLE:
+          msg += 'localização indisponível. Verifique sua conexão.';
+          break;
+        case erro.TIMEOUT:
+          msg += 'demorou muito (timeout). Tente novamente.';
+          break;
+        default:
+          msg += erro.message;
+      }
+      status.textContent = '❌ ' + msg.substring(0, 60);
+      status.style.color = '#dc2626';
+      console.log('[GEO] Erro:', erro);
+      alert(msg);
+    },
+    // OPÇÕES
+    {
+      enableHighAccuracy: true, // tenta GPS (mais preciso)
+      timeout: 10000,           // desiste em 10 segundos
+      maximumAge: 0             // não usar cache, sempre nova
+    }
+  );
+}
+
+// ── Função: limpa a localização pendente (após salvar item) ──
+function limparLocalizacaoPendente() {
+  localizacaoPendente = null;
+  var status = document.getElementById('status-localizacao');
+  if (status) {
+    status.textContent = 'Nenhuma localização anexada';
+    status.style.color = '#64748b';
+  }
+}
+
+// ── Conecta o botão ──
+var btnLoc = document.getElementById('btn-localizacao');
+if (btnLoc) {
+  btnLoc.addEventListener('click', capturarLocalizacao);
 }
